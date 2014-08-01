@@ -1,5 +1,5 @@
-#include "GameScene/GameScene.h"
-#include "GameScene/BackgroundLayer.h"
+#include "GameScene.h"
+#include "../HelloWorldScene.h"
 
 #define SENS 0.01
 USING_NS_CC;
@@ -35,7 +35,14 @@ bool GameScene::init()
 
 
     auto bg_layer = BackgroundLayer::createBGLayer();
+    bg_layer->setTag(101);
     this->addChild(bg_layer);
+
+    obstacles = new Obstacles();
+    this->schedule(schedule_selector(GameScene::makeObstacles), 1.0);
+    this->scheduleUpdate();
+
+    ///////
 
 	initData();
 
@@ -57,6 +64,17 @@ bool GameScene::init()
 
     return true;
 }
+
+//////// obstacle
+
+void GameScene::makeObstacles(float delta) {
+
+	obstacles->addObstacle(this);
+}
+
+
+/////// car
+
 
 void GameScene::initData()
 {
@@ -82,17 +100,9 @@ void GameScene::onTouchMoved(Touch* touch, Event* event)
 }
 void GameScene::onTouchEnded(Touch* touch, Event* event)
 {
-	isTouchDown=false;
-}
-void GameScene::onTouchCancelled(Touch* touch, Event* event)
-{
-	onTouchEnded(touch,event);
-}
-
-void GameScene::update(float dt)
-{
+/*
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
@@ -126,4 +136,90 @@ void GameScene::update(float dt)
 			isTouchDown=false;
 		}
 	}
+	*/
+	isTouchDown=false;
+}
+void GameScene::onTouchCancelled(Touch* touch, Event* event)
+{
+	onTouchEnded(touch,event);
+}
+
+void GameScene::update(float dt)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	if(true==isTouchDown)
+	{
+		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
+		{
+			float leftsize = playerCar->getCarPosition().x;
+			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
+			if (leftsize <= 260 || running>0)
+			{
+
+			}
+			else
+			{
+				CCLog("Left ");
+				playerCar->moveLeft();
+			}
+			isTouchDown=false;
+		}
+		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
+		{
+			float rightsize = playerCar->getCarPosition().x;
+			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
+			if (rightsize >= 430 || running>0)
+			{
+
+			}
+			else
+			{
+				CCLog("Right ");
+				playerCar->moveRight();
+			}
+			isTouchDown=false;
+		}
+	}
+
+
+
+	Sprite *spr_car = playerCar->getSpriteCar();
+	Rect rect_car = spr_car->getBoundingBox();
+	Array *obs_array = obstacles->getObstacleArray();
+	for (int i = 0; i < obs_array->count(); i++) {
+		Sprite *spr_obs = (Sprite*)obs_array->getObjectAtIndex(i);
+		Rect rect_obs = spr_obs->getBoundingBox();
+		if (rect_car.intersectsRect(rect_obs)) {
+			CCLOG("충돌!!!!");
+			spr_obs->stopAllActions();
+			auto particle = ParticleExplosion::create();
+			particle->setPosition(spr_car->getPosition());
+			particle->setLife(1.0);
+			particle->setZOrder(10);
+			this->addChild(particle);
+			this->unschedule(schedule_selector(GameScene::makeObstacles));
+			//spr_obs->removeFromParent();
+			//obs_array->removeObject(spr_obs, true);
+			this->getChildByTag(101)->getChildByTag(0)->stopAllActions();
+			this->getChildByTag(101)->getChildByTag(1)->stopAllActions();
+			this->getChildByTag(101)->getChildByTag(2)->stopAllActions();
+			this->getChildByTag(101)->getChildByTag(3)->stopAllActions();
+			this->getChildByTag(101)->getChildByTag(10)->stopAllActions();
+			this->getChildByTag(101)->getChildByTag(11)->stopAllActions();
+			for (int j = 0; j < obs_array->count(); j++) {
+				Sprite *spr_obs2 = (Sprite*)obs_array->getObjectAtIndex(j);
+				spr_obs2->stopAllActions();
+			}
+			spr_car->stopAllActions();
+			spr_car->getChildByTag(777)->removeFromParent();
+			this->pause();
+			this->scheduleOnce(schedule_selector(GameScene::gameOver), 3.0);
+		}
+	}
+}
+
+void GameScene::gameOver(float delta) {
+
+	Director::getInstance()->replaceScene(HelloWorld::createScene());
 }
