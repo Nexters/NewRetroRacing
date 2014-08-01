@@ -17,6 +17,8 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+
+    void changeScene(Ref *sender);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
