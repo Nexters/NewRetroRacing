@@ -20,7 +20,7 @@ car::~car(void)
 void car::addOnRoad(Node* road)
 {
 	Size s = road->getContentSize();
-	sCar->setPosition(120,180);
+	sCar->setPosition(400,180);
 	road->addChild(sCar,3);
 	moveLength = s.width/2;
 	addFire();
