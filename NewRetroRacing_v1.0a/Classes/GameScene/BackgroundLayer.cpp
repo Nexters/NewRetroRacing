@@ -24,7 +24,7 @@ bool BackgroundLayer::init()
     auto spr_bg_img1 = Sprite::create("bg.png");
     spr_bg_img1->setAnchorPoint(Point::ZERO);
     spr_bg_img1->setPosition(Point::ZERO);
-    this->addChild(spr_bg_img1);
+    this->addChild(spr_bg_img1, 0);
 
     float spr_height = spr_bg_img1->getContentSize().height;
     float spr_width = spr_bg_img1->getContentSize().width;
@@ -32,7 +32,7 @@ bool BackgroundLayer::init()
     auto spr_bg_img2 = Sprite::create("bg.png");
     spr_bg_img2->setAnchorPoint(Point::ZERO);
     spr_bg_img2->setPosition(Point(0.0, spr_height));
-    this->addChild(spr_bg_img2);
+    this->addChild(spr_bg_img2, 0);
 
     flag1 = true;
     flag2 = false;
@@ -51,7 +51,26 @@ bool BackgroundLayer::init()
 
 	////////////////////////////////////////
 
+	Array *rail_arr = Array::create();
+	rail_arr->retain();
 
+	for (int i = 0; i < 4; i++) {
+		auto spr_rail = Sprite::create("rail.png");
+		spr_rail->setAnchorPoint(Point(0.5, 0.0));
+		spr_rail->setPosition(Point(spr_bg_img1->getContentSize().width/2, spr_rail->getContentSize().height * i));
+		this->addChild(spr_rail);
+		rail_arr->addObject(spr_rail);
+	}
+/*
+	for (int i = 0; i < 4; i++) {
+		Sprite *spr_rail = (Sprite*)rail_arr->getObjectAtIndex(i);
+		auto act_rail1 = MoveTo::create(RAIL_MOVING_TIME, Point(spr_bg_img1->getContentSize().width/2, -spr_rail->getContentSize().height));
+		auto act_rail2 = Place::create(Point(spr_bg_img1->getContentSize().width/2, spr_rail->getContentSize().height * 3));
+		auto act_rail3 = Sequence::create(act_rail1, act_rail2, NULL);
+		auto act_rail4 = RepeatForever::create(act_rail3);
+		spr_rail->runAction(act_rail4);
+	}
+*/
 
     return true;
 }
