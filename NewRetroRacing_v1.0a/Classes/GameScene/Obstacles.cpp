@@ -30,17 +30,19 @@ void Obstacles::addObstacle(Layer *layer) {
 
 	obs->setAnchorPoint(Point(0.5, 0.5));
 	srand(time(NULL));
-	ran_num = rand() % 2;
+	ran_num = rand() % 4;
 	switch(ran_num) {
 	case 0:
+	case 3:
 		obs->setPosition(245, 1500);
 		break;
 	case 1:
+	case 2:
 		obs->setPosition(245+230, 1500);
 		break;
 	}
 
-	auto obs_act1 = MoveTo::create(1.5, Point(obs->getPositionX(), -300));
+	auto obs_act1 = MoveTo::create(1.3, Point(obs->getPositionX(), -300));
 	auto obs_act2 = CallFuncN::create(CC_CALLBACK_1(Obstacles::ObstacleActionCallBack, this));
 	auto obs_act3 = Sequence::create(obs_act1, obs_act2, NULL);
 	obs->runAction(obs_act3);
