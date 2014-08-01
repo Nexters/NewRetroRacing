@@ -1,7 +1,9 @@
-#include "GameScene.h"
-#include "BackgroundLayer.h"
+#include "GameScene/GameScene.h"
+#include "GameScene/BackgroundLayer.h"
 
 USING_NS_CC;
+
+const unsigned width_basis = 720;
 
 Scene* GameScene::createScene() {
 
@@ -26,8 +28,15 @@ bool GameScene::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    this->setAnchorPoint(Point::ZERO);
+    this->setPosition(Point::ZERO);
+    this->setScale(visibleSize.width / width_basis);
+
+
     auto bg_layer = BackgroundLayer::createBGLayer();
     this->addChild(bg_layer);
+
+
 
     return true;
 }
