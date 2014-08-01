@@ -1,4 +1,4 @@
-#include "car.h"
+#include "GameScene/car.h"
 
 
 car::car(std::string name, std::string _carSpriteFileName)
@@ -20,7 +20,7 @@ car::~car(void)
 void car::addOnRoad(Node* road)
 {
 	Size s = road->getContentSize();
-	sCar->setPosition(230,180);
+	sCar->setPosition(245,180);
 	road->addChild(sCar,3);
 	moveLength = s.width/2;
 	addFire();

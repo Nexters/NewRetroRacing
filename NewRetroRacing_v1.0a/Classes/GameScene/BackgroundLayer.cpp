@@ -3,7 +3,7 @@
 USING_NS_CC;
 
 const unsigned int BG_MOVING_TIME = 10;
-const unsigned int RAIL_MOVING_TIME = 3;
+const unsigned int RAIL_MOVING_TIME = 1;
 bool flag1, flag2;
 
 Layer* BackgroundLayer::createBGLayer() {
@@ -12,8 +12,8 @@ Layer* BackgroundLayer::createBGLayer() {
 	return layer;
 }
 
-bool BackgroundLayer::init()
-{
+bool BackgroundLayer::init() {
+
     if ( !Layer::init() )
     {
         return false;
@@ -22,81 +22,80 @@ bool BackgroundLayer::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
     auto spr_bg_img1 = Sprite::create("bg.png");
+    auto spr_bg_img2 = Sprite::create("bg.png");
+    auto *flag_bg_img1 = new bool(true);
+    auto *flag_bg_img2 = new bool(false);
+
+    float spr_height = spr_bg_img1->getContentSize().height;
+    //float spr_width = spr_bg_img1->getContentSize().width;
+
     spr_bg_img1->setAnchorPoint(Point::ZERO);
     spr_bg_img1->setPosition(Point::ZERO);
     this->addChild(spr_bg_img1, 0);
 
-    float spr_height = spr_bg_img1->getContentSize().height;
-    float spr_width = spr_bg_img1->getContentSize().width;
-
-    auto spr_bg_img2 = Sprite::create("bg.png");
     spr_bg_img2->setAnchorPoint(Point::ZERO);
     spr_bg_img2->setPosition(Point(0.0, spr_height));
     this->addChild(spr_bg_img2, 0);
 
-    flag1 = true;
-    flag2 = false;
+    auto bg_img1_act1 = MoveBy::create(BG_MOVING_TIME, Point(0.0, -spr_height));
+    auto bg_img1_act2 = CallFuncN::create(CC_CALLBACK_1(BackgroundLayer::BgActionCallBack, this));
+    auto bg_img1_act3 = Sequence::create(bg_img1_act1, bg_img1_act2, NULL);
+    auto bg_img1_act4 = RepeatForever::create(bg_img1_act3);
+    spr_bg_img1->runAction(bg_img1_act4);
 
-    auto act1 = MoveBy::create(BG_MOVING_TIME, Point(0.0, -spr_height));
-    auto act2 = CallFuncN::create(CC_CALLBACK_1(BackgroundLayer::action_call_back1, this));
-    auto act3 = Sequence::create(act1, act2, NULL);
-    auto act4 = RepeatForever::create(act3);
-    spr_bg_img1->runAction(act4);
-
-    auto act5 = MoveBy::create(BG_MOVING_TIME, Point(0.0, -spr_height));
-	auto act6 = CallFuncN::create(CC_CALLBACK_1(BackgroundLayer::action_call_back2, this));
-	auto act7 = Sequence::create(act5, act6, NULL);
-	auto act8 = RepeatForever::create(act7);
-	spr_bg_img2->runAction(act8);
-
-	////////////////////////////////////////
-
-	Array *rail_arr = Array::create();
-	rail_arr->retain();
+    auto bg_img2_act1 = MoveBy::create(BG_MOVING_TIME, Point(0.0, -spr_height));
+	auto bg_img2_act2 = CallFuncN::create(CC_CALLBACK_1(BackgroundLayer::BgActionCallBack, this));
+	auto bg_img2_act3 = Sequence::create(bg_img2_act1, bg_img2_act2, NULL);
+	auto bg_img2_act4 = RepeatForever::create(bg_img2_act3);
+	spr_bg_img2->runAction(bg_img2_act4);
 
 	for (int i = 0; i < 4; i++) {
 		auto spr_rail = Sprite::create("rail.png");
 		spr_rail->setAnchorPoint(Point(0.5, 0.0));
 		spr_rail->setPosition(Point(spr_bg_img1->getContentSize().width/2, spr_rail->getContentSize().height * i));
 		this->addChild(spr_rail);
-		rail_arr->addObject(spr_rail);
+
+		auto rail_act1 = MoveBy::create(RAIL_MOVING_TIME, Point(0.0, -spr_rail->getContentSize().height));
+		auto rail_act2 = CallFuncN::create(CC_CALLBACK_1(BackgroundLayer::RailActionCallBack, this));
+		auto rail_act3 = Sequence::create(rail_act1, rail_act2, NULL);
+		auto rail_act4 = RepeatForever::create(rail_act3);
+		spr_rail->runAction(rail_act4);
 	}
-/*
-	for (int i = 0; i < 4; i++) {
-		Sprite *spr_rail = (Sprite*)rail_arr->getObjectAtIndex(i);
-		auto act_rail1 = MoveTo::create(RAIL_MOVING_TIME, Point(spr_bg_img1->getContentSize().width/2, -spr_rail->getContentSize().height));
-		auto act_rail2 = Place::create(Point(spr_bg_img1->getContentSize().width/2, spr_rail->getContentSize().height * 3));
-		auto act_rail3 = Sequence::create(act_rail1, act_rail2, NULL);
-		auto act_rail4 = RepeatForever::create(act_rail3);
-		spr_rail->runAction(act_rail4);
-	}
-*/
 
     return true;
 }
 
-void BackgroundLayer::action_call_back1(Ref *sender) {
+void BackgroundLayer::BgActionCallBack(Ref *sender) {
 
 	auto spr = (Sprite*)sender;
-	if (flag1) {
+	float y_ax = spr->getPositionY();
+	float spr_height = spr->getContentSize().height;
+
+	if (y_ax <= -spr_height) {
 		spr->setPosition(Point(0.0, spr->getContentSize().height));
-		flag1 = false;
 	}
 	else {
 		spr->setPosition(Point(0.0, 0.0));
-		flag1 = true;
 	}
 }
 
-void BackgroundLayer::action_call_back2(Ref *sender) {
+void BackgroundLayer::RailActionCallBack(Ref *sender) {
 
 	auto spr = (Sprite*)sender;
-	if (flag1) {
-		spr->setPosition(Point(0.0, spr->getContentSize().height));
-		flag2 = false;
+	float y_ax = spr->getPositionY();
+	float spr_height = spr->getContentSize().height;
+
+	if (y_ax <= -spr_height) {
+		spr->setPosition(Point(spr->getPositionX(), spr->getContentSize().height * 3));
 	}
-	else {
-		spr->setPosition(Point(0.0, 0.0));
-		flag2 = true;
+	else if (y_ax <= 0) {
+		spr->setPosition(Point(spr->getPositionX(), spr->getContentSize().height * 0));
+	}
+	else if (y_ax <= spr_height) {
+		spr->setPosition(Point(spr->getPositionX(), spr->getContentSize().height * 1));
+	}
+	else if (y_ax <= spr_height * 2) {
+		spr->setPosition(Point(spr->getPositionX(), spr->getContentSize().height * 2));
 	}
 }
+

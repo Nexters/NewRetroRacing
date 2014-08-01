@@ -1,7 +1,7 @@
 #include "GameScene/GameScene.h"
 #include "GameScene/BackgroundLayer.h"
 
-#define SENS 0.02
+#define SENS 0.01
 USING_NS_CC;
 
 const unsigned width_basis = 720;
@@ -41,7 +41,7 @@ bool GameScene::init()
 
 	playerCar = new car("default","rocket.png");
 	playerCar->addOnRoad(this);
-	playerCar->setMoveLength(260);
+	playerCar->setMoveLength(230);
 
 	this->scheduleUpdate();
 
