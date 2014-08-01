@@ -41,7 +41,7 @@ bool GameScene::init()
 
 	playerCar = new car("default","rocket.png");
 	playerCar->addOnRoad(this);
-	playerCar->setMoveLength(360);
+	playerCar->setMoveLength(240);
 
 	this->scheduleUpdate();
 
