@@ -34,7 +34,7 @@ void car::addFire()
 	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
     cache->addSpriteFramesWithFile("fire.plist");
 	Animation* animation = Animation::create();
-	animation->setDelayPerUnit(0.5f);
+	animation->setDelayPerUnit(0.2f);
 	animation->addSpriteFrameWithFileName("fire_1.png");
 	animation->addSpriteFrameWithFileName("fire_2.png");
 	animation->addSpriteFrameWithFileName("fire_3.png");
