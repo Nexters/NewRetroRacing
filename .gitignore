@@ -16,3 +16,8 @@ NewRetroRacing_v1.0a/proj.android/build_native.py
 NewRetroRacing_v1.0a/proj.android/proguard-project.txt
 NewRetroRacing_v1.0a/proj.android/project.properties
 NewRetroRacing_v1.0a/proj.android/README.md
+NewRetroRacing_v1.0a/proj.android/obj
+NewRetroRacing_v1.0a/proj.android/libs
+NewRetroRacing_v1.0a/proj.android/bin
+NewRetroRacing_v1.0a/proj.android/gen
+NewRetroRacing_v1.0a/proj.android/assets
