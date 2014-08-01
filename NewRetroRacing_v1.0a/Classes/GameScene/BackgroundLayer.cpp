@@ -8,8 +8,7 @@ bool flag1, flag2;
 
 Layer* BackgroundLayer::createBGLayer() {
 
-	auto layer = BackgroundLayer::create();
-	return layer;
+	return BackgroundLayer::create();
 }
 
 bool BackgroundLayer::init() {
@@ -23,6 +22,8 @@ bool BackgroundLayer::init() {
 
     auto spr_bg_img1 = Sprite::create("bg.png");
     auto spr_bg_img2 = Sprite::create("bg.png");
+    spr_bg_img1->setTag(10);
+    spr_bg_img2->setTag(11);
     auto *flag_bg_img1 = new bool(true);
     auto *flag_bg_img2 = new bool(false);
 
@@ -51,6 +52,7 @@ bool BackgroundLayer::init() {
 
 	for (int i = 0; i < 4; i++) {
 		auto spr_rail = Sprite::create("rail.png");
+		spr_rail->setTag(i);
 		spr_rail->setAnchorPoint(Point(0.5, 0.0));
 		spr_rail->setPosition(Point(spr_bg_img1->getContentSize().width/2, spr_rail->getContentSize().height * i));
 		this->addChild(spr_rail);
@@ -98,4 +100,3 @@ void BackgroundLayer::RailActionCallBack(Ref *sender) {
 		spr->setPosition(Point(spr->getPositionX(), spr->getContentSize().height * 2));
 	}
 }
-

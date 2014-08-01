@@ -1,4 +1,4 @@
-#include "GameScene/car.h"
+#include "car.h"
 
 
 car::car(std::string name, std::string _carSpriteFileName)
@@ -29,6 +29,7 @@ void car::addOnRoad(Node* road)
 void car::addFire()
 {
 	Sprite* sFire = Sprite::create("fire_1.png");
+	sFire->setTag(777);
 	sFire->setPosition(Vec2(85,-20));
 
 	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
@@ -39,7 +40,6 @@ void car::addFire()
 	animation->addSpriteFrameWithFileName("fire_2.png");
 	animation->addSpriteFrameWithFileName("fire_3.png");
 	animation->addSpriteFrameWithFileName("fire_4.png");
-	
 
 	sFire->runAction(RepeatForever::create(Animate::create(animation)));
 	sCar->addChild(sFire);

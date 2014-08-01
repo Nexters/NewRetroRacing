@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "car.h"
+#include "Obstacles.h"
+#include "BackgroundLayer.h"
 
 class GameScene : public cocos2d::Layer
 {
@@ -19,6 +21,9 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
 
+    void makeObstacles(float delta);
+
+
 	void initData();
 
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
@@ -32,6 +37,9 @@ public:
 	float currTouchPos[2];
 
 	car* playerCar;
+	Obstacles *obstacles;
+
+	void gameOver(float delta);
 
 	void update(float dt);
 };

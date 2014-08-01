@@ -10,7 +10,6 @@ public:
 	virtual bool init();
 	CREATE_FUNC(BackgroundLayer);
 private:
-
 	void BgActionCallBack(Ref *sender);
 	void RailActionCallBack(Ref *sender);
 };
