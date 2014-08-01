@@ -21,8 +21,11 @@ public:
 	void addFire();
 	void moveRight();
 	void moveLeft();
+	
 	Vec2 getCarPosition();
 	void setCarPosition(Vec2 pos);
+
+	Sprite* getSpriteCar();
 
 	void setMoveLength(float _moveLegnth);
 

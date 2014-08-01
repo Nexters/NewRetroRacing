@@ -20,7 +20,7 @@ car::~car(void)
 void car::addOnRoad(Node* road)
 {
 	Size s = road->getContentSize();
-	sCar->setPosition(s.width/4,180);
+	sCar->setPosition(s.width/2-115,180);
 	road->addChild(sCar,3);
 	moveLength = s.width/2;
 	addFire();
@@ -70,4 +70,9 @@ void car::setCarPosition(Vec2 pos)
 void car::setMoveLength(float _moveLength)
 {
 	moveLength = _moveLength;
+}
+
+Sprite* car::getSpriteCar()
+{
+	return this->sCar;
 }
