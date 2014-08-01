@@ -21,10 +21,13 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // turn on display FPS
-    director->setDisplayStats(true);
-
+    //director->setDisplayStats(true);
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
+
+    // 멀티 해상도 정책을 FIXED_WIDTH로 설정.
+	Size win_size = director->getVisibleSize();
+	glview->setDesignResolutionSize(win_size.width, win_size.height, ResolutionPolicy::FIXED_WIDTH);
 
     // create a scene. it's an autorelease object
     auto scene = HelloWorld::createScene();
