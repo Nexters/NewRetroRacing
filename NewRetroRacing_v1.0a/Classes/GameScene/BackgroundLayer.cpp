@@ -2,8 +2,8 @@
 
 USING_NS_CC;
 
-const unsigned int BG_MOVING_TIME = 10;
-const unsigned int RAIL_MOVING_TIME = 1;
+const float BG_MOVING_TIME = 10;
+const float RAIL_MOVING_TIME = 0.5;
 bool flag1, flag2;
 
 Layer* BackgroundLayer::createBGLayer() {

@@ -47,13 +47,13 @@ void car::addFire()
 
 void car::moveRight()
 {
-	MoveBy* act = MoveBy::create(0.1,Vec2(moveLength,0));
+	MoveBy* act = MoveBy::create(0.05,Vec2(moveLength,0));
 	sCar->runAction(act);
 }
 
 void car::moveLeft()
 {
-	MoveBy* act = MoveBy::create(0.1,Vec2(-moveLength,0));
+	MoveBy* act = MoveBy::create(0.05,Vec2(-moveLength,0));
 	sCar->runAction(act);
 }
 
