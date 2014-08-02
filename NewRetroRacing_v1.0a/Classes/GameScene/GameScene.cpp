@@ -4,7 +4,13 @@
 #define SENS 0.01
 USING_NS_CC;
 
+using namespace CocosDenshion;
+
 const unsigned width_basis = 720;
+unsigned int sound1, sound2;
+static float call_back_term = 1.5;
+
+
 
 Scene* GameScene::createScene() {
 
@@ -39,7 +45,7 @@ bool GameScene::init()
     this->addChild(bg_layer);
 
     obstacles = new Obstacles();
-    this->schedule(schedule_selector(GameScene::makeObstacles), 1.0);
+    this->schedule(schedule_selector(GameScene::makeObstacles), call_back_term);
     this->scheduleUpdate();
 
     ///////
@@ -62,6 +68,9 @@ bool GameScene::init()
 
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
 
+	sound1 = SimpleAudioEngine::getInstance()->playEffect("JetEngine.wav", true);
+	SimpleAudioEngine:: getInstance()->setEffectsVolume(1.0);
+
     return true;
 }
 
@@ -70,6 +79,8 @@ bool GameScene::init()
 void GameScene::makeObstacles(float delta) {
 
 	obstacles->addObstacle(this);
+	if (call_back_term > 0.1)
+		call_back_term -= 0.05;
 }
 
 
@@ -192,6 +203,10 @@ void GameScene::update(float dt)
 		Rect rect_obs = spr_obs->getBoundingBox();
 		if (rect_car.intersectsRect(rect_obs)) {
 			CCLOG("충돌!!!!");
+
+			SimpleAudioEngine::getInstance()->stopEffect(sound1);
+			sound2 = SimpleAudioEngine::getInstance()->playEffect("Bomb.wav", false);
+
 			spr_obs->stopAllActions();
 			auto particle = ParticleExplosion::create();
 			particle->setPosition(spr_car->getPosition());
@@ -222,4 +237,5 @@ void GameScene::update(float dt)
 void GameScene::gameOver(float delta) {
 
 	Director::getInstance()->replaceScene(HelloWorld::createScene());
+	SimpleAudioEngine::getInstance()->stopEffect(sound2);
 }
