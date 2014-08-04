@@ -10,14 +10,13 @@ const unsigned width_basis = 720;
 unsigned int sound1, sound2;
 static float call_back_term = 1.5;
 
-
-
 Scene* GameScene::createScene() {
 
 	auto scene = Scene::create();
     auto layer = GameScene::create();
 
     scene->addChild(layer);
+    call_back_term = 1.5;
 
     return scene;
 }

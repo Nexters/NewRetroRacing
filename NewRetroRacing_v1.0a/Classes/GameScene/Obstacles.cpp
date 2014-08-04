@@ -8,6 +8,7 @@ Obstacles::Obstacles() {
 	// TODO Auto-generated constructor stub
 	obs_array = Array::create();
 	obs_array->retain();
+	moving_time = 1.5;
 }
 
 void Obstacles::addObstacle(Layer *layer) {
