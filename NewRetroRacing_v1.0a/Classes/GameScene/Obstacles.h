@@ -14,6 +14,9 @@ public:
 	void stopAnimation();
 	Array* getObstacleArray() { return obs_array; }
 
+	static float moving_time;
+
+
 private:
 	Array *obs_array;
 

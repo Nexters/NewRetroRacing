@@ -2,6 +2,7 @@
 #include "HelloWorldScene.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
 
 AppDelegate::AppDelegate() {
 
@@ -31,6 +32,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // create a scene. it's an autorelease object
     auto scene = HelloWorld::createScene();
+
+    SimpleAudioEngine::getInstance()->preloadEffect("JetEngine.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("Bomb.wav");
 
     // run
     director->runWithScene(scene);

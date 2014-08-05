@@ -1,10 +1,15 @@
 #include "Obstacles.h"
 #include "time.h"
 
+float Obstacles::moving_time = 1.5;
+
 Obstacles::Obstacles() {
 	// TODO Auto-generated constructor stub
 	obs_array = Array::create();
 	obs_array->retain();
+
+	moving_time = 1.5;
+
 }
 
 void Obstacles::addObstacle(Layer *layer) {
@@ -42,7 +47,9 @@ void Obstacles::addObstacle(Layer *layer) {
 		break;
 	}
 
+
 	auto obs_act1 = MoveTo::create(1.3, Point(obs->getPositionX(), -300));
+
 	auto obs_act2 = CallFuncN::create(CC_CALLBACK_1(Obstacles::ObstacleActionCallBack, this));
 	auto obs_act3 = Sequence::create(obs_act1, obs_act2, NULL);
 	obs->runAction(obs_act3);
