@@ -14,7 +14,7 @@
 static float SCREEN_SIZE_RATIO = 1.0;
 
 static float CURRENT_SPEED_LEVEL = 1.0;
-static float SPEED_CONSTANT = 200.0;
+static float SPEED_CONSTANT = 400.0;
 
 
 #endif /* CONSTANTS_H_ */

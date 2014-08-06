@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-class RoadController : cocos2d::Ref {
+class RoadController {
 
 public:
 	RoadController();
@@ -15,13 +15,17 @@ public:
 	void release();
 	void attachRoadLayerTo(cocos2d::Layer* _layer);
 
-	void attachLane(int to_where);
-	void detachLane(int from_where);
+	bool attachLane(int to_where);
+	bool detachLane(int from_where);
 
 private:
+	void addRailTo(Sprite* road);
+	void addRail_callback(Ref *spr);
+	void stopRailActionOf(Sprite* road);
 	bool __attachLane(int to_where);
-	void removeCurrentRoad_callback(Ref *spr_cur_road);
-	void makeNewRoad_callback(Ref *spr_cur_road);
+	bool __detachLane(int from_where);
+	void removeCurrentRoad_callback();
+	void makeNewRoad_callback();
 
 private:
 	Layer *road_layer;
@@ -30,6 +34,7 @@ private:
 	int lane_cnt;
 	Vec2 hor_range;		// Horizontal range
 	float lane_width;
+	bool act_is_running;	// Action Locking variable
 };
 
 #endif /* ROADCONTROLLER_H_ */

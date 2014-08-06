@@ -56,6 +56,11 @@ bool HelloWorld::init()
     rocket->runAction(act1);
 */
 
+    auto bg_spr = Sprite::create("bg.png");
+    bg_spr->setAnchorPoint(Point::ZERO);
+    bg_spr->setPosition(Point::ZERO);
+    this->addChild(bg_spr);
+
     auto left_btn = Sprite::create("CloseSelected.png");
     left_btn->setAnchorPoint(Point(0.5, 0.5));
     left_btn->setPosition(Point(40, 100));
