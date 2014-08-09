@@ -1,6 +1,10 @@
 #ifndef __GAME_SCENE_H__
 #define __GAME_SCENE_H__
 
+#define TAG_SPRITE_COIN 1002
+#define TAG_LABEL_COIN   3
+
+
 #include "cocos2d.h"
 #include "car.h"
 #include "Obstacles.h"
@@ -22,9 +26,13 @@ public:
     CREATE_FUNC(GameScene);
 
     void makeObstacles(float delta);
-
+	void initLabel();
 
 	void initData();
+	void setLabelCoin();
+
+	Size visibleSize;
+	int coin;
 
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
