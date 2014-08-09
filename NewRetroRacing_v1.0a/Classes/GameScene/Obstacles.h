@@ -1,6 +1,6 @@
 #ifndef OBSTACLES_H_
 #define OBSTACLES_H_
-
+#define TAG_SPRITE_COIN 1002
 #include "cocos2d.h"
 
 USING_NS_CC;

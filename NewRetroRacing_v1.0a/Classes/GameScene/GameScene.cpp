@@ -30,8 +30,10 @@ bool GameScene::init()
     {
         return false;
     }
+	initData();
+	
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     this->setAnchorPoint(Point::ZERO);
@@ -50,7 +52,7 @@ bool GameScene::init()
 
     ///////
 
-	initData();
+	
 
 	playerCar = new car("default","rocket.png");
 	playerCar->addOnRoad(this);
@@ -68,6 +70,8 @@ bool GameScene::init()
 
 	sound1 = SimpleAudioEngine::getInstance()->playEffect("JetEngine.wav", true);
 	SimpleAudioEngine:: getInstance()->setEffectsVolume(1.0);
+
+	initLabel();
 
     return true;
 }
@@ -92,6 +96,8 @@ void GameScene::initData()
 	isTouchDown=false;
 	initTouchPos[0]=0;
 	initTouchPos[1]=0;
+	call_back_term = 1.5;
+	coin = 0;
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event)
@@ -157,7 +163,7 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event)
 
 void GameScene::update(float dt)
 {
-	Size visibleSize = Director::getInstance()->getVisibleSize();
+	visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	if(true==isTouchDown)
 	{
@@ -199,10 +205,22 @@ void GameScene::update(float dt)
 	Rect rect_car = spr_car->getBoundingBox();
 	Array *obs_array = obstacles->getObstacleArray();
 	for (int i = 0; i < obs_array->count(); i++) {
+
 		Sprite *spr_obs = (Sprite*)obs_array->getObjectAtIndex(i);
 		Rect rect_obs = spr_obs->getBoundingBox();
 		if (rect_car.intersectsRect(rect_obs)) {
 			CCLOG("충돌!!!!");
+
+			if(spr_obs->getTag() == TAG_SPRITE_COIN){
+				sound2 = SimpleAudioEngine::getInstance()->playEffect("coinGet.ogg", false);
+
+				this->removeChild(spr_obs);
+				obs_array->removeObject(spr_obs);
+				coin++;
+				setLabelCoin();
+			}
+
+		else {
 
 			SimpleAudioEngine::getInstance()->stopEffect(sound1);
 			sound2 = SimpleAudioEngine::getInstance()->playEffect("Bomb.wav", false);
@@ -230,13 +248,37 @@ void GameScene::update(float dt)
 			spr_car->getChildByTag(777)->removeFromParent();
 			this->pause();
 			this->scheduleOnce(schedule_selector(GameScene::gameOver), 3.0);
+			}
 		}
 	}
 }
+
+
+void GameScene::initLabel()
+{
+	auto label_coin = Label::createWithSystemFont("", "", 50);
+	label_coin->setAnchorPoint(Point(0, 1));
+	label_coin->setPosition(Point(visibleSize.width-200, visibleSize.height - 10));
+	label_coin->setTag(TAG_LABEL_COIN);
+	label_coin->setColor(Color3B::WHITE);
+	this->addChild(label_coin,10);
+
+	setLabelCoin();
+}
+
+void GameScene::setLabelCoin()
+{
+	auto label = (Label*)this->getChildByTag(TAG_LABEL_COIN);
+	label->setString(StringUtils::format("COIN : %d", coin));
+}
+
+
 
 void GameScene::gameOver(float delta) {
 
 	Director::getInstance()->replaceScene(HelloWorld::createScene());
 	SimpleAudioEngine::getInstance()->stopEffect(sound2);
-
+	obstacles->~Obstacles();
+	this->unschedule(schedule_selector(GameScene::makeObstacles));
+	call_back_term = 1.5;
 }

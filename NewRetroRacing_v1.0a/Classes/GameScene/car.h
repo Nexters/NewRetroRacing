@@ -11,6 +11,8 @@ Car class
 using namespace std;
 using namespace cocos2d;
 
+#define SPEEDVAL 5
+
 class car
 {
 public:
@@ -26,8 +28,15 @@ public:
 	void setCarPosition(Vec2 pos);
 
 	Sprite* getSpriteCar();
+	
+	void setCarScale(float scale);
 
 	void setMoveLength(float _moveLegnth);
+
+	void changeRoadMode(float _roadMinX,float _roadMaxX, int _roadNum);//set
+
+	float getMinX();
+	float getMaxX();
 
 private:
 	//status for car
@@ -37,4 +46,8 @@ private:
 	Size carSize;
 	float moveLength;//move size of road
 	int actionCount;
+	
+	int roadNum;
+	float roadMinX;
+	float roadMaxX;
 };

@@ -48,14 +48,14 @@ void car::addFire()
 void car::moveRight()
 {
 
-	MoveBy* act = MoveBy::create(0.05,Vec2(moveLength,0));
+	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(moveLength,0));
 	sCar->runAction(act);
 }
 
 void car::moveLeft()
 {
 
-	MoveBy* act = MoveBy::create(0.05,Vec2(-moveLength,0));
+	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(-moveLength,0));
 	sCar->runAction(act);
 }
 
@@ -69,6 +69,11 @@ void car::setCarPosition(Vec2 pos)
 	sCar->setPosition(pos);
 }
 
+void car::setCarScale(float scale)
+{
+	sCar->setScale(scale);
+}
+
 void car::setMoveLength(float _moveLength)
 {
 	moveLength = _moveLength;
@@ -77,4 +82,11 @@ void car::setMoveLength(float _moveLength)
 Sprite* car::getSpriteCar()
 {
 	return this->sCar;
+}
+
+void car::changeRoadMode(float _roadMinX,float _roadMaxX, int _roadNum)
+{
+	roadMinX = _roadMinX;
+	roadMaxX = _roadMaxX;
+	roadNum = _roadNum;
 }

@@ -9,6 +9,7 @@ Obstacles::Obstacles() {
 	obs_array->retain();
 
 	moving_time = 1.5;
+	int moving_time2 = 1.5;
 
 }
 
@@ -16,7 +17,7 @@ void Obstacles::addObstacle(Layer *layer) {
 
 	Sprite *obs = NULL;
 	srand(time(NULL));
-	int ran_num = rand() % 3;
+	int ran_num = rand() % 4;
 
 	switch(ran_num) {
 	case 0:
@@ -28,6 +29,23 @@ void Obstacles::addObstacle(Layer *layer) {
 	case 2:
 		obs = Sprite::create("obstacle_3.png");
 		break;
+	case 3:
+		obs = Sprite::create("coin/coin1.png");
+		obs->setTag(TAG_SPRITE_COIN);
+
+		auto animation = Animation::create();
+		animation->setDelayPerUnit(0.2);
+
+		for (int i = 0; i<8; i++) {
+			animation->addSpriteFrameWithFile(StringUtils::format("coin/coin%d.png", i + 1));
+
+		}
+
+		auto animate = Animate::create(animation);
+		obs->runAction(RepeatForever::create(animate));
+
+		break;
+
 	}
 
 	if (obs == NULL)
