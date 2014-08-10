@@ -237,5 +237,4 @@ void GameScene::gameOver(float delta) {
 
 	Director::getInstance()->replaceScene(HelloWorld::createScene());
 	SimpleAudioEngine::getInstance()->stopEffect(sound2);
-	call_back_term = 1.5;
 }
