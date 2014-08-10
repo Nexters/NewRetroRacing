@@ -1,8 +1,20 @@
 #include "HelloWorldScene.h"
+#include "Shared.h"
+
+#define LEFT_BTN_TAG1 	10
+#define LEFT_BTN_TAG2 	11
+#define LEFT_BTN_TAG3	12
+#define LEFT_BTN_TAG4	13
+#define LEFT_BTN_TAG5	14
+
+#define RIGHT_BTN_TAG1 	20
+#define RIGHT_BTN_TAG2 	21
+#define RIGHT_BTN_TAG3	22
+#define RIGHT_BTN_TAG4	23
+#define RIGHT_BTN_TAG5	24
 
 
-#define LEFT_BTN_TAG 	10
-#define RIGHT_BTN_TAG 	11
+float ttt = 1.0;
 
 Scene* HelloWorld::createScene()
 {
@@ -33,7 +45,6 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     SCREEN_SIZE_RATIO = visibleSize.width / 720;
-    CURRENT_SPEED_LEVEL = 1.0;
 
     this->setAnchorPoint(Point::ZERO);
     this->setPosition(Point::ZERO);
@@ -50,30 +61,95 @@ bool HelloWorld::init()
     rocket->setPosition(hello_world->getContentSize().width / 2, hello_world->getContentSize().height / 2);
     hello_world->addChild(rocket);
 
+
     auto act1 = MoveTo::create(2.0,
     		Point(hello_world->getContentSize().width - rocket->getContentSize().width / 2 + 50,
     				hello_world->getContentSize().height / 2));
     rocket->runAction(act1);
-*/
 
+    auto act1 = MoveBy::create(ttt, Point(50.0, 0));
+    auto act2 = CallFuncN::create(CC_CALLBACK_1(HelloWorld::action_callback, this));
+    auto act3 = Sequence::create(act1, act2, NULL);
+    rocket->runAction(act3);
+*/
     auto bg_spr = Sprite::create("bg.png");
     bg_spr->setAnchorPoint(Point::ZERO);
     bg_spr->setPosition(Point::ZERO);
     this->addChild(bg_spr);
 
-    auto left_btn = Sprite::create("CloseSelected.png");
-    left_btn->setAnchorPoint(Point(0.5, 0.5));
-    left_btn->setPosition(Point(40, 100));
-    left_btn->setScale(2.0);
-    left_btn->setTag(LEFT_BTN_TAG);
-    this->addChild(left_btn);
+    auto left_btn1 = Sprite::create("CloseSelected.png");
+    left_btn1->setAnchorPoint(Point(0.5, 0.5));
+    left_btn1->setPosition(Point(40, 100));
+    left_btn1->setScale(2.0);
+    left_btn1->setTag(LEFT_BTN_TAG1);
+    this->addChild(left_btn1);
 
-    auto right_btn = Sprite::create("CloseSelected.png");
-    right_btn->setAnchorPoint(Point(0.5, 0.5));
-    right_btn->setPosition(Point(720 - 40, 100));
-    right_btn->setScale(2.0);
-    right_btn->setTag(RIGHT_BTN_TAG);
-    this->addChild(right_btn);
+    auto left_btn2 = Sprite::create("CloseSelected.png");
+	left_btn2->setAnchorPoint(Point(0.5, 0.5));
+	left_btn2->setPosition(Point(40, 200));
+	left_btn2->setScale(2.0);
+	left_btn2->setTag(LEFT_BTN_TAG2);
+	this->addChild(left_btn2);
+
+    auto left_btn3 = Sprite::create("CloseSelected.png");
+	left_btn3->setAnchorPoint(Point(0.5, 0.5));
+	left_btn3->setPosition(Point(40, 300));
+	left_btn3->setScale(2.0);
+	left_btn3->setTag(LEFT_BTN_TAG3);
+	this->addChild(left_btn3);
+
+    auto left_btn4 = Sprite::create("CloseSelected.png");
+	left_btn4->setAnchorPoint(Point(0.5, 0.5));
+	left_btn4->setPosition(Point(40, 400));
+	left_btn4->setScale(2.0);
+	left_btn4->setTag(LEFT_BTN_TAG4);
+	this->addChild(left_btn4);
+
+    auto left_btn5 = Sprite::create("CloseSelected.png");
+	left_btn5->setAnchorPoint(Point(0.5, 0.5));
+	left_btn5->setPosition(Point(40, 500));
+	left_btn5->setScale(2.0);
+	left_btn5->setTag(LEFT_BTN_TAG5);
+	this->addChild(left_btn5);
+
+
+    auto right_btn1 = Sprite::create("CloseSelected.png");
+    right_btn1->setAnchorPoint(Point(0.5, 0.5));
+    right_btn1->setPosition(Point(720 - 40, 100));
+    right_btn1->setScale(2.0);
+    right_btn1->setTag(RIGHT_BTN_TAG1);
+    this->addChild(right_btn1);
+
+    auto right_btn2 = Sprite::create("CloseSelected.png");
+	right_btn2->setAnchorPoint(Point(0.5, 0.5));
+	right_btn2->setPosition(Point(720 - 40, 200));
+	right_btn2->setScale(2.0);
+	right_btn2->setTag(RIGHT_BTN_TAG2);
+	this->addChild(right_btn2);
+
+	auto right_btn3 = Sprite::create("CloseSelected.png");
+	right_btn3->setAnchorPoint(Point(0.5, 0.5));
+	right_btn3->setPosition(Point(720 - 40, 300));
+	right_btn3->setScale(2.0);
+	right_btn3->setTag(RIGHT_BTN_TAG3);
+	this->addChild(right_btn3);
+
+	auto right_btn4 = Sprite::create("CloseSelected.png");
+	right_btn4->setAnchorPoint(Point(0.5, 0.5));
+	right_btn4->setPosition(Point(720 - 40, 400));
+	right_btn4->setScale(2.0);
+	right_btn4->setTag(RIGHT_BTN_TAG4);
+	this->addChild(right_btn4);
+
+	auto right_btn5 = Sprite::create("CloseSelected.png");
+	right_btn5->setAnchorPoint(Point(0.5, 0.5));
+	right_btn5->setPosition(Point(720 - 40, 500));
+	right_btn5->setScale(2.0);
+	right_btn5->setTag(RIGHT_BTN_TAG5);
+	this->addChild(right_btn5);
+
+
+
 
     auto touch_listener = EventListenerTouchOneByOne::create();
     touch_listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
@@ -81,7 +157,7 @@ bool HelloWorld::init()
     		->addEventListenerWithFixedPriority(touch_listener, 1);
 
     road_cont = new RoadController();
-    road_cont->attachRoadLayerTo(this);
+    road_cont->attachRoadLayerTo(this, 1);
 
     return true;
 }
@@ -91,25 +167,105 @@ bool HelloWorld::onTouchBegan(Touch *touch, Event *event) {
 	Point touch_location = touch->getLocation();
 	touch_location = touch_location / SCREEN_SIZE_RATIO;
 
-	Sprite *left_btn = (Sprite*)this->getChildByTag(LEFT_BTN_TAG);
-	Rect left_btn_rect = left_btn->getBoundingBox();
-	Sprite *right_btn = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG);
-	Rect right_btn_rect = right_btn->getBoundingBox();
+	Sprite *left_btn1 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG1);
+	Rect left_btn1_rect = left_btn1->getBoundingBox();
 
-	if (left_btn_rect.containsPoint(touch_location)) {
-		CCLOG("LEFT BTN TOUCHED!!");
-		road_cont->attachLane(1);
+	Sprite *left_btn2 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG2);
+	Rect left_btn2_rect = left_btn2->getBoundingBox();
+
+	Sprite *left_btn3 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG3);
+	Rect left_btn3_rect = left_btn3->getBoundingBox();
+
+	Sprite *left_btn4 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG4);
+	Rect left_btn4_rect = left_btn4->getBoundingBox();
+
+	Sprite *left_btn5 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG5);
+	Rect left_btn5_rect = left_btn5->getBoundingBox();
+
+	////
+
+	Sprite *right_btn1 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG1);
+	Rect right_btn1_rect = right_btn1->getBoundingBox();
+
+	Sprite *right_btn2 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG2);
+	Rect right_btn2_rect = right_btn2->getBoundingBox();
+
+	Sprite *right_btn3 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG3);
+	Rect right_btn3_rect = right_btn3->getBoundingBox();
+
+	Sprite *right_btn4 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG4);
+	Rect right_btn4_rect = right_btn4->getBoundingBox();
+
+	Sprite *right_btn5 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG5);
+	Rect right_btn5_rect = right_btn5->getBoundingBox();
+
+
+	if (left_btn1_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN1 TOUCHED!!");
+		road_cont->attachLane(1, 1);
 		return true;
 	}
-	else if (right_btn_rect.containsPoint(touch_location)) {
-		CCLOG("RIGHT BTN TOUCHED!!");
-		road_cont->attachLane(2);
+	else if (left_btn2_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN2 TOUCHED!!");
+		road_cont->attachLane(1, 2);
+		return true;
+	}
+	else if (left_btn3_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN3 TOUCHED!!");
+		road_cont->attachLane(2, 1);
+		return true;
+	}
+	else if (left_btn4_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN4 TOUCHED!!");
+		road_cont->attachLane(2, 2);
+		return true;
+	}
+	else if (left_btn5_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN5 TOUCHED!!");
+		road_cont->attachLane(2, 3);
+		return true;
+	}
+	else if (right_btn1_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN1 TOUCHED!!");
+		road_cont->detachLane(1, 1);
+		return true;
+	}
+	else if (right_btn2_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN2 TOUCHED!!");
+		road_cont->detachLane(1, 2);
+		return true;
+	}
+	else if (right_btn3_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN3 TOUCHED!!");
+		road_cont->detachLane(2, 1);
+		return true;
+	}
+	else if (right_btn4_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN4 TOUCHED!!");
+		road_cont->detachLane(2, 2);
+		return true;
+	}
+	else if (right_btn5_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN5 TOUCHED!!");
+		road_cont->detachLane(2, 3);
 		return true;
 	}
 	else {
 		CCLOG("NOT TOUCHED!!");
 		return false;
 	}
+}
+
+void HelloWorld::action_callback(Ref *spr) {
+
+	CCLOG("aaa");
+	Sprite *rocket = (Sprite*)spr;
+	auto act1 = MoveBy::create(ttt, Point(50.0, 0));
+	auto act2 = CallFuncN::create(CC_CALLBACK_1(HelloWorld::action_callback, this));
+	auto act3 = Sequence::create(act1, act2, NULL);
+	rocket->runAction(act3);
+
+		ttt += 3.0;
 }
 
 

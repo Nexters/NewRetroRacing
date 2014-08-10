@@ -2,7 +2,6 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-#include "Constants.h"
 #include "RoadController.h"
 
 USING_NS_CC;
@@ -19,6 +18,7 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     
+    void action_callback(Ref *spr);
 
 
     // implement the "static create()" method manually
