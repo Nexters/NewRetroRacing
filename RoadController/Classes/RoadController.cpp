@@ -245,7 +245,7 @@ void RoadController::__detachLane(int how_many, int from_where) {
 	//float cur_road_height = cur_road_visible_rect.size.height;
 	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
 
-	float act2_moving_distance = next_road->getPositionY() + 125;
+	float act2_moving_distance = next_road->getPositionY();
 	float act2_moving_time = act2_moving_distance / moving_speed;
 
 	// start actions
