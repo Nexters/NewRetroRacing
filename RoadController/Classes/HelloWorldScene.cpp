@@ -6,13 +6,13 @@
 #define LEFT_BTN_TAG3	12
 #define LEFT_BTN_TAG4	13
 #define LEFT_BTN_TAG5	14
+#define LEFT_BTN_TAG6	15
 
 #define RIGHT_BTN_TAG1 	20
 #define RIGHT_BTN_TAG2 	21
 #define RIGHT_BTN_TAG3	22
 #define RIGHT_BTN_TAG4	23
 #define RIGHT_BTN_TAG5	24
-
 
 float ttt = 1.0;
 
@@ -36,7 +36,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Layer::init() )
+    if ( !LayerColor::initWithColor(Color4B(255, 255, 255, 255)) )
     {
         return false;
     }
@@ -44,11 +44,25 @@ bool HelloWorld::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    SCREEN_SIZE_RATIO = visibleSize.width / 720;
+    SHARED::SCREEN_SIZE_RATIO = visibleSize.width / 720;
 
     this->setAnchorPoint(Point::ZERO);
     this->setPosition(Point::ZERO);
-    this->setScale(SCREEN_SIZE_RATIO);
+    this->setScale(SHARED::SCREEN_SIZE_RATIO);
+/*
+    auto spr = Sprite::create("HelloWorld.png");
+    spr->setAnchorPoint(Point(0.5, 0.5));
+    spr->setPosition(Point(GAME_SCENE_WIDTH / 2.0, GAME_SCENE_HEIGHT / 2.0));
+    this->addChild(spr, 10);
+    auto spr2 = Sprite::create("HelloWorld.png");
+	spr2->setAnchorPoint(Point(0.5, 0.5));
+	spr2->setPosition(Point(GAME_SCENE_WIDTH / 2.0, GAME_SCENE_HEIGHT / 2.0 + 300));
+	this->addChild(spr2, 11);
+
+    Rect spr_rect = spr->getBoundingBox();
+    spr->setTextureRect(Rect(0, 100,
+    		spr_rect.size.width, spr_rect.size.height / 2.0));
+    		*/
 
 /*
     auto hello_world = Sprite::create("HelloWorld.png");
@@ -148,7 +162,12 @@ bool HelloWorld::init()
 	right_btn5->setTag(RIGHT_BTN_TAG5);
 	this->addChild(right_btn5);
 
-
+	auto left_btn6 = Sprite::create("CloseSelected.png");
+	left_btn6->setAnchorPoint(Point(0.5, 0.5));
+	left_btn6->setPosition(Point(40, 1100));
+	left_btn6->setScale(2.0);
+	left_btn6->setTag(LEFT_BTN_TAG6);
+	this->addChild(left_btn6);
 
 
     auto touch_listener = EventListenerTouchOneByOne::create();
@@ -159,13 +178,21 @@ bool HelloWorld::init()
     road_cont = new RoadController();
     road_cont->attachRoadLayerTo(this, 1);
 
+    this->schedule(schedule_selector(HelloWorld::update_time), 5.0);
+
     return true;
+}
+
+void HelloWorld::update_time(float delta) {
+
+	SHARED::ELAPSED_TIME += 5.0;
+	//CCLOG("%f", ELAPSED_TIME);
 }
 
 bool HelloWorld::onTouchBegan(Touch *touch, Event *event) {
 
 	Point touch_location = touch->getLocation();
-	touch_location = touch_location / SCREEN_SIZE_RATIO;
+	touch_location = touch_location / SHARED::SCREEN_SIZE_RATIO;
 
 	Sprite *left_btn1 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG1);
 	Rect left_btn1_rect = left_btn1->getBoundingBox();
@@ -181,6 +208,9 @@ bool HelloWorld::onTouchBegan(Touch *touch, Event *event) {
 
 	Sprite *left_btn5 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG5);
 	Rect left_btn5_rect = left_btn5->getBoundingBox();
+
+	Sprite *left_btn6 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG6);
+	Rect left_btn6_rect = left_btn6->getBoundingBox();
 
 	////
 
@@ -248,6 +278,11 @@ bool HelloWorld::onTouchBegan(Touch *touch, Event *event) {
 	else if (right_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN5 TOUCHED!!");
 		road_cont->detachLane(2, 3);
+		return true;
+	}
+	else if (left_btn6_rect.containsPoint(touch_location)) {
+		CCLOG("LEFT BTN6 TOUCHED!!");
+		SHARED::ELAPSED_TIME = 0.0;
 		return true;
 	}
 	else {

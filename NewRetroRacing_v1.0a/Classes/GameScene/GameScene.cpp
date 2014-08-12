@@ -77,9 +77,8 @@ bool GameScene::init()
 
 void GameScene::makeObstacles(float delta) {
 
-	obstacles->addObstacle(this);
-	if (call_back_term > 0.1)
-		call_back_term -= 0.05;
+	//ELAPSED_TIME += 1.0;
+	//CCLOG("%f", ELAPSED_TIME);
 }
 
 

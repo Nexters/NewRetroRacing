@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-class HelloWorld : public cocos2d::Layer
+class HelloWorld : public cocos2d::LayerColor
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -19,7 +19,7 @@ public:
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     void action_callback(Ref *spr);
-
+    void update_time(float delta);
 
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);

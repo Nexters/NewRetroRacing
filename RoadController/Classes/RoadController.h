@@ -19,14 +19,16 @@ public:
 
 private:
 	void addRailTo(Sprite* road, int _num_lane);
-	void pauseRailActionsOf(Sprite* road);
+	void pauseRailActionsOf(Sprite* road, float resizing_ratio);
 	void resumeRailActionsOf(Sprite* road);
 	void __attachLane(int how_many, int to_where);
 	void __detachLane(int how_many, int from_where);
 	void removeCurrentRoad_callback();
-	void removeCurrentRoad_callback_d(Ref *sender, void *d);
+	void removeCurrentRoad_callback_d(Ref* sender, void* d);
 	void makeNewRoad_callback();
-	void railAction_callback(Ref *_rail_spr);
+	void railAction_callback(Ref* _rail_spr, Ref* _road);
+	void addHorizontalRailTo(Sprite* road, int _num_lane, int lane_num);
+	void removeHorizontalRail();
 
 private:
 	Layer *road_layer;		// Road를 대표하는 layer. 이 layer 위에 각 node들이 존재한다.
@@ -36,6 +38,7 @@ private:
 	Vec2 hor_range;			// Horizontal range
 	float lane_width;
 	bool change_running;	// Locking variable for Actions(changing the number of lanes)
+	Vector<Sprite*> *hori_rails;
 };
 
 #endif /* ROADCONTROLLER_H_ */

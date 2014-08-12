@@ -8,28 +8,27 @@ RoadController::RoadController() {
 	road_layer = cocos2d::Layer::create();
 
 	num_lane = 2;		// 초기 lane 갯수는 2
+	hori_rails = new Vector<Sprite*>();
 
 	// current road sprite setting
-	cur_road = cocos2d::Sprite::create("road.png");
+	cur_road = cocos2d::Sprite::create("road_2560.png");
 	cur_road->setAnchorPoint(Point(0.5, 0.0));
 	cur_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, 0.0));
 	road_layer->addChild(cur_road);
 	addRailTo(cur_road, num_lane);	// add rail sprites to current road sprite
 
 	// next road sprite setting
-	next_road = cocos2d::Sprite::create("road.png");
+	next_road = cocos2d::Sprite::create("road_2560.png");
 	next_road->setAnchorPoint(Point(0.5, 0.0));
-	next_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, cur_road->getContentSize().height));
+	next_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, GAME_SCENE_HEIGHT));
 	road_layer->addChild(next_road);
 
 	// calculate horizontal range & lane width
 	Rect road_rect = cur_road->getBoundingBox();
 	hor_range = Vec2(road_rect.getMinX(), road_rect.getMaxX());
-	lane_width = (road_rect.getMaxX() - road_rect.getMinX()) / 2; // 이 값을 어떻게 사용해야할까?
+	lane_width = road_rect.size.width / 2; // 이 값을 어떻게 사용해야할까?
 
 	change_running = false;
-
-	//this->road_layer->scheduleUpdate();
 }
 
 void RoadController::attachRoadLayerTo(Layer* _layer, int zOrder) {
@@ -133,69 +132,67 @@ bool RoadController::detachLane(int how_many, int from_where) {
 void RoadController::__attachLane(int how_many, int to_where) {
 
 	change_running = true;	// __attachLane & __detachLane function is locked
-	pauseRailActionsOf(cur_road); 	// Actions of rail sprites on road sprite should be paused
-
-	float cur_road_height = cur_road->getBoundingBox().getMaxY() - cur_road->getBoundingBox().getMinY();
-	float moving_speed = getCurrentSpeed(ELAPSED_TIME);
-	float resizing_ratio = 1.0;
 
 	// calculate resizing ratio of current road sprite & add rail sprites to next road sprite.
-	/*
-	if (how_many == 1) {	// when you attach one lane
-		resizing_ratio = (float)num_lane / (num_lane + 1);
-		addRailTo(next_road, num_lane + 1);
-		pauseRailActionsOf(next_road);	// Because addRailTo function start actions of rail sprites,
-	}									// you should pause the actions until process of attachLanes is over.
-	else if (how_many == 2) {	// when you attach two lanes
-		resizing_ratio = (float)num_lane / (num_lane + 2);
-		addRailTo(next_road, num_lane + 2);
-		pauseRailActionsOf(next_road);
-	}*/
-	resizing_ratio = (float)num_lane / (num_lane + how_many);
+	float resizing_ratio = (float)num_lane / (num_lane + how_many);
 	addRailTo(next_road, num_lane + how_many);
-	pauseRailActionsOf(next_road);	// Because addRailTo function start actions of rail sprites,
-									// you should pause the actions until process of attachLanes is over.
+	pauseRailActionsOf(next_road, resizing_ratio);	// Because addRailTo function start actions of rail sprites,
+	pauseRailActionsOf(cur_road, resizing_ratio);	// you should pause the actions until process of attachLanes is over.
 
 	// set basic values for attaching Lane(s)
-	if (to_where == 1) {
-		cur_road->setAnchorPoint(Point(1.0, 0.0));
-		cur_road->setPosition(Point(next_road->getBoundingBox().getMaxX(), 0.0));
+	if (to_where == 1) {		// 좌측에 lane이 더해지는 경우
+		cur_road->setAnchorPoint(Point(1.0, 0.0));	// Anchor point를 우측 하단에 잡는다.
+		cur_road->setPosition(Point(next_road->getBoundingBox().getMaxX(), 0.0)); // 다음 생성될 road와 오른쪽 끝 라을 맞춘다.
+		for (int i = 0; i < how_many; i++)
+			addHorizontalRailTo(next_road, num_lane + how_many, i+1);
 	}
 	else if (to_where == 2) {
 		cur_road->setAnchorPoint(Point(0.0, 0.0));
 		cur_road->setPosition(Point(next_road->getBoundingBox().getMinX(), 0.0));
+		for (int i = 0; i < how_many; i++)
+			addHorizontalRailTo(next_road, num_lane + how_many, num_lane + how_many - i);
 	}
 	else if (to_where == 3) {
 		cur_road->setAnchorPoint(Point(0.5, 0.0));
 		cur_road->setPosition(
-				Point((next_road->getBoundingBox().getMinX() + next_road->getBoundingBox().getMaxX()) / 2.0, 0.0)
-				);
+				Point(GAME_SCENE_WIDTH / 2.0, 0.0)
+				);		// 다음 생성될 road의 가로 중간점.
+		addHorizontalRailTo(next_road, num_lane + how_many, 1);
+		addHorizontalRailTo(next_road, num_lane + how_many, num_lane + how_many);
 	}
-	float act2_moving_distance = (cur_road_height * (1 - resizing_ratio));
+	else
+		return;
+
+	Rect cur_road_rect = cur_road->getBoundingBox();
+	float cur_road_height = cur_road_rect.size.height;
+	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
+
+	float act2_moving_distance = cur_road_height - (cur_road_height * resizing_ratio);
 	float act2_moving_time = act2_moving_distance / moving_speed;
 
 	// start actions
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
 	auto act1 = ScaleBy::create(road_size_change_time, resizing_ratio);
-	cur_road->runAction(act1);
-
-	//auto act2 = MoveBy::create(act2_moving_time,
-	//						Point(0.0, -act2_moving_distance));
-	auto act2 = MoveBy::create(road_size_change_time,
-								Point(0.0, -act2_moving_distance));
-	auto act2_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::removeCurrentRoad_callback, this));
-	auto act2_3 = Sequence::create(act2, act2_2, NULL);				// RoadController::removeCurrentRoad_callback
-	next_road->runAction(act2_3);
+	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::removeCurrentRoad_callback, this));
+	auto act1_3 = Sequence::create(act1, act1_2, NULL);
+	cur_road->runAction(act1_3);								// current road의 scale을 축소
 
 	num_lane += how_many;
 }
 
 void RoadController::removeCurrentRoad_callback() {
 
-	float moving_speed = getCurrentSpeed(ELAPSED_TIME);
-	float cur_road_height = cur_road->getBoundingBox().getMaxY() - cur_road->getBoundingBox().getMinY();
+	Rect cur_road_rect = cur_road->getBoundingBox();
+	if (cur_road_rect.size.height >= GAME_SCENE_HEIGHT) {
+		float ratio = cur_road->getScale();
+		Rect cur_road_visible_rect = Rect(0, cur_road_rect.size.height - next_road->getPositionY(),
+											cur_road_rect.size.width / ratio, next_road->getPositionY() / ratio);
+		cur_road->setTextureRect(cur_road_visible_rect);	// Rect의 이중 비율 변화...
+	}
 
-	float act3_moving_distance = cur_road_height;
+	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
+	float cur_road_height = cur_road->getBoundingBox().getMaxY() - cur_road->getBoundingBox().getMinY();
+	float act3_moving_distance = next_road->getPositionY();
 	float act3_moving_time = act3_moving_distance / moving_speed;
 
 	auto act3 = MoveBy::create(act3_moving_time, Point(0.0, -act3_moving_distance));
@@ -210,35 +207,45 @@ void RoadController::removeCurrentRoad_callback() {
 void RoadController::__detachLane(int how_many, int from_where) {
 
 	change_running = true;	// __attachLane & __detachLane function is locked
-	pauseRailActionsOf(cur_road); 	// Actions of rail sprites on road sprite should be paused
 
-	float next_road_height = next_road->getBoundingBox().getMaxY() - next_road->getBoundingBox().getMinY();
-	float moving_speed = getCurrentSpeed(ELAPSED_TIME);
-	float resizing_ratio = 1.0;
-
-	resizing_ratio = (float)num_lane / (num_lane - how_many);
+	float resizing_ratio = (float)num_lane / (num_lane - how_many);
 	addRailTo(next_road, num_lane - how_many);
-	pauseRailActionsOf(next_road);
+	pauseRailActionsOf(next_road, resizing_ratio);
+	pauseRailActionsOf(cur_road, resizing_ratio);
 
 	if (from_where == 1) {
 		next_road->setAnchorPoint(Point(1.0, 0.0));
 		next_road->setPosition(
-			Point(cur_road->getBoundingBox().getMaxX(), cur_road->getBoundingBox().getMaxY()));
+			Point(cur_road->getBoundingBox().getMaxX(), next_road->getPositionY()));
+		for (int i = 0; i < how_many; i++)
+			addHorizontalRailTo(cur_road, num_lane, i+1);
 	}
 	else if (from_where == 2) {
 		next_road->setAnchorPoint(Point(0.0, 0.0));
 		next_road->setPosition(
-			Point(cur_road->getBoundingBox().getMinX(), cur_road->getBoundingBox().getMaxY()));
+			Point(cur_road->getBoundingBox().getMinX(), next_road->getPositionY()));
+		for (int i = 0; i < how_many; i++)
+			addHorizontalRailTo(cur_road, num_lane, num_lane-i);
 	}
 	else if (from_where == 3) {
 		next_road->setAnchorPoint(Point(0.5, 0.0));
 		next_road->setPosition(
 				Point((cur_road->getBoundingBox().getMinX() + cur_road->getBoundingBox().getMaxX()) / 2.0,
-						cur_road->getBoundingBox().getMaxY()));
+						next_road->getPositionY()));
+		addHorizontalRailTo(cur_road, num_lane, 1);
+		addHorizontalRailTo(cur_road, num_lane, num_lane);
 	}
 	next_road->setScale(1 / resizing_ratio);
 
-	float act2_moving_distance = next_road_height * (1 / resizing_ratio);
+	Rect cur_road_rect = cur_road->getBoundingBox();
+	Rect cur_road_visible_rect = Rect(0, cur_road_rect.size.height - next_road->getPositionY(),
+										cur_road_rect.size.width, next_road->getPositionY());
+	cur_road->setTextureRect(cur_road_visible_rect);
+
+	//float cur_road_height = cur_road_visible_rect.size.height;
+	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
+
+	float act2_moving_distance = next_road->getPositionY() + 125;
 	float act2_moving_time = act2_moving_distance / moving_speed;
 
 	// start actions
@@ -259,55 +266,30 @@ void RoadController::__detachLane(int how_many, int from_where) {
 
 void RoadController::removeCurrentRoad_callback_d(Ref *sender, void *d) {
 
-	float moving_speed = getCurrentSpeed(ELAPSED_TIME);
+	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
 	float resizing_ratio = *(float*)d;
-	float next_road_height = next_road->getBoundingBox().getMaxY() - next_road->getBoundingBox().getMinY();
-	float act2_moving_distance = next_road_height * resizing_ratio - next_road_height;
-			//(next_road_height * (1 - (1 / resizing_ratio)));
-	float act2_moving_time = act2_moving_distance / moving_speed;
-
-	if (next_road->getAnchorPoint().x == 0.0) {
-		next_road->setPosition(
-			Point(next_road->getBoundingBox().getMinX(),
-					next_road->getBoundingBox().getMaxY()));
-	}
-	else if (next_road->getAnchorPoint().x == 1.0) {
-		next_road->setPosition(
-			Point(next_road->getBoundingBox().getMaxX(),
-					next_road->getBoundingBox().getMaxY()));
-	}
-	else if (next_road->getAnchorPoint().x == 0.5) {
-		next_road->setPosition(
-			Point((next_road->getBoundingBox().getMinX() + next_road->getBoundingBox().getMaxX()) / 2.0,
-					next_road->getBoundingBox().getMaxY()));
-	}
-	else
-		return;
-
-	next_road->setAnchorPoint(Point(next_road->getAnchorPoint().x, 1.0));
+	//float next_road_height = next_road->getBoundingBox().getMaxY() - next_road->getBoundingBox().getMinY();
+	//float act2_moving_distance = next_road_height * resizing_ratio - next_road_height;
+	//float act2_moving_time = act2_moving_distance / moving_speed;
 
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
 	auto act1 = ScaleBy::create(road_size_change_time, resizing_ratio);
-	next_road->runAction(act1);
-
-	//auto act2 = MoveBy::create(act2_moving_time,
-	//						Point(0.0, -act2_moving_distance));
-	auto act2 = MoveBy::create(road_size_change_time,
-								Point(0.0, -act2_moving_distance));
-	auto act2_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::makeNewRoad_callback, this));
-	auto act2_3 = Sequence::create(act2, act2_2, NULL);				// RoadController::removeCurrentRoad_callback
-	cur_road->runAction(act2_3);
+	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::makeNewRoad_callback, this));
+	auto act1_3 = Sequence::create(act1, act1_2, NULL);				// RoadController::makeNewRoad_callback
+	next_road->runAction(act1_3);
 }
 
 void RoadController::makeNewRoad_callback() {
 
+	//cur_road->removeAllChildrenWithCleanup(true);
+	removeHorizontalRail();
 	cur_road->removeFromParent();
 	cur_road = next_road;
 	resumeRailActionsOf(cur_road);
 
-	next_road = cocos2d::Sprite::create("road.png");
+	next_road = cocos2d::Sprite::create("road_2560.png");
 	next_road->setAnchorPoint(Point(0.5, 0.0));
-	next_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, cur_road->getContentSize().height));
+	next_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, GAME_SCENE_HEIGHT));
 	road_layer->addChild(next_road);
 
 	change_running = false;	// __attachLane & __detachLane function is unlocked
@@ -338,37 +320,71 @@ void RoadController::addRailTo(Sprite* road, int _num_lane) {
 	float rail_height = Sprite::create("rail_2.png")->getContentSize().height;
 	rail_height *= size_ratio;
 
-	for (float height_sum = 0.0; height_sum < (GAME_SCENE_HEIGHT + rail_height); height_sum += rail_height) {
+	for (float height_sum = 0.0;
+			height_sum <= (road->getContentSize().height + 2 * rail_height);
+			height_sum += rail_height) {
+
 		Sprite *rail_spr = Sprite::create(img_file_name->getCString());
-		rail_spr->setAnchorPoint(Point::ZERO);
-		rail_spr->setPosition(Point(0.0, height_sum));
+		rail_spr->setAnchorPoint(Point(0.5, 0.0));
+		rail_spr->setPosition(Point(road->boundingBox().size.width / 2.0, height_sum));
 		rail_spr->setScale(size_ratio);
 		road->addChild(rail_spr);
-		railAction_callback(rail_spr);
+		railAction_callback(rail_spr, road);
 	}
 }
 
-void RoadController::pauseRailActionsOf(Sprite* road) {
+void RoadController::railAction_callback(Ref *_rail_spr, Ref* _road) {
+
+	Sprite *rail_spr = (Sprite*)_rail_spr;
+	Sprite *road = (Sprite*)_road;
+
+	float rail_height = rail_spr->getBoundingBox().size.height;
+	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
+	float moving_time = rail_height / moving_speed;
+
+	if (rail_spr->getBoundingBox().getMaxY() <= 0.1) {
+
+		int num_rail = ((GAME_SCENE_HEIGHT * 2 + rail_height) / rail_height) + 2;
+		rail_spr->setPosition(Point(road->getBoundingBox().size.width / 2.0, rail_height * (num_rail - 1)));
+	}
+
+	auto act1 = MoveBy::create(moving_time, Point(0.0, -rail_height));
+	auto act2 = CallFuncN::create(CC_CALLBACK_1(RoadController::railAction_callback, this, road));
+	auto act3 = Sequence::create(act1, act2, NULL);
+	rail_spr->runAction(act3);
+}
+
+void RoadController::pauseRailActionsOf(Sprite* road, float resizing_ratio) {
 
 	Vector<Node*> rail_imgs = road->getChildren();
+	float new_next_position_y = 1280+250+10;
+
 	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
+
 		Sprite *rail_spr = (Sprite*)*it;
 		rail_spr->pauseSchedulerAndActions();
-		if (road == cur_road && rail_spr->getBoundingBox().getMinY() >= road->getBoundingBox().getMaxY()) {
-			//rail_spr->setVisible(false);
-			rail_spr->removeFromParent();
-		}
-		else if (road == cur_road &&
-				rail_spr->getBoundingBox().getMinY() <= road->getBoundingBox().getMaxY() &&
-				rail_spr->getBoundingBox().getMaxY() >= road->getBoundingBox().getMaxY()) {
+		Rect rail_spr_rect = rail_spr->getBoundingBox();
+		Rect road_spr_rect = road->getBoundingBox();
 
-			rail_spr->setTextureRect(
-					Rect(0, 0,
-							rail_spr->getContentSize().width,
-							road->getBoundingBox().getMaxY() - rail_spr->getBoundingBox().getMinY()));
-
-			//rail_spr->removeFromParent();
+		// road == cur_road 라는 조건은, pauseRailActionsOf func가 cur_road가 사라질 때 호출되는 경우를 말한다.
+		if (road == cur_road && resizing_ratio < 1.0 &&
+			rail_spr_rect.getMinY() * resizing_ratio >= GAME_SCENE_HEIGHT) {
+			if (rail_spr_rect.getMinY() * resizing_ratio < new_next_position_y)
+				new_next_position_y = rail_spr_rect.getMinY() * resizing_ratio;
+			rail_spr->setVisible(false);
 		}
+		else if (road == cur_road && resizing_ratio >= 1.0 &&
+			rail_spr_rect.getMinY() >= GAME_SCENE_HEIGHT) {
+			if (rail_spr_rect.getMinY() < new_next_position_y)
+				new_next_position_y = rail_spr_rect.getMinY();
+			rail_spr->setVisible(false);
+		}
+		else {
+
+		}
+	}
+	if (road == cur_road) {
+		next_road->setPositionY(new_next_position_y);
 	}
 }
 
@@ -378,26 +394,33 @@ void RoadController::resumeRailActionsOf(Sprite* road) {
 	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
 		Sprite *rail_spr = (Sprite*)*it;
 		rail_spr->resumeSchedulerAndActions();
+		rail_spr->setVisible(true);
 	}
 }
 
-void RoadController::railAction_callback(Ref *_rail_spr) {
+void RoadController::addHorizontalRailTo(Sprite* road, int _num_lane, int lane_num) {
 
-	Sprite *rail_spr = (Sprite*)_rail_spr;
+	float ratio = 2.0 / _num_lane;
+	auto hori_rail = Sprite::create("horizontal_rail.png");
+	hori_rail->setAnchorPoint(Point(0.5, 0.0));
 
-	float rail_height = rail_spr->getBoundingBox().getMaxY() - rail_spr->getBoundingBox().getMinY();
-	float moving_speed = getCurrentSpeed(ELAPSED_TIME);
-	float moving_time = rail_height / moving_speed;
-
-	if (rail_spr->getBoundingBox().getMaxY() <= 0.01) {
-		int num_rail = ((GAME_SCENE_HEIGHT + rail_height) / rail_height) + 1;
-		rail_spr->setPosition(Point(0.0, rail_height * (num_rail - 1)));
+	float x = (135.0 + (255 * (lane_num - 1))) * ratio;
+	float y = -10.0 * ratio;
+	if (road == cur_road) {
+		y = next_road->getPositionY() - (15 * ratio);
 	}
+	hori_rail->setPosition(Point(x, y));
+	hori_rail->setScale(ratio);
+	road->addChild(hori_rail);
+	hori_rails->pushBack(hori_rail);
+}
 
-	auto act1 = MoveBy::create(moving_time, Point(0.0, -rail_height));
-	auto act2 = CallFuncN::create(CC_CALLBACK_1(RoadController::railAction_callback, this));
-	auto act3 = Sequence::create(act1, act2, NULL);
-	rail_spr->runAction(act3);
+void RoadController::removeHorizontalRail() {
+
+	for (std::vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ++it) {
+		Sprite *hori_rail = (Sprite*)*it;
+		hori_rail->removeFromParent();
+	}
 }
 
 void RoadController::release() {
@@ -407,4 +430,10 @@ void RoadController::release() {
 
 RoadController::~RoadController() {
 
+	if (cur_road != NULL)
+		cur_road->removeFromParent();
+	if (next_road != NULL)
+		cur_road->removeFromParent();
+	if (road_layer != NULL)
+		road_layer->removeFromParent();
 }
