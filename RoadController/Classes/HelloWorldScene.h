@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "RoadController.h"
+#include "BgLayerController.h"
 
 USING_NS_CC;
 
@@ -28,6 +29,7 @@ public:
 
 public:
     RoadController* road_cont;
+    BgLayerController* bg_cont;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

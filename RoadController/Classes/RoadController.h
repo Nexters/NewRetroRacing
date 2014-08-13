@@ -12,7 +12,7 @@ public:
 	virtual ~RoadController();
 
 	void release();
-	void attachRoadLayerTo(cocos2d::Layer* _layer, int zOrder);
+	void attachRoadLayerTo(Layer* _layer, int zOrder);
 
 	bool attachLane(int how_many, int to_where);
 	bool detachLane(int how_many, int from_where);

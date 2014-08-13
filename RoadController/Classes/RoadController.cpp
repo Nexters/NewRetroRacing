@@ -22,7 +22,7 @@ RoadController::RoadController() {
 	next_road->setAnchorPoint(Point(0.5, 0.0));
 	next_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, GAME_SCENE_HEIGHT));
 	road_layer->addChild(next_road);
-
+    
 	// calculate horizontal range & lane width
 	Rect road_rect = cur_road->getBoundingBox();
 	hor_range = Vec2(road_rect.getMinX(), road_rect.getMaxX());
@@ -168,7 +168,7 @@ void RoadController::__attachLane(int how_many, int to_where) {
 	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
 
 	float act2_moving_distance = cur_road_height - (cur_road_height * resizing_ratio);
-	float act2_moving_time = act2_moving_distance / moving_speed;
+	//float act2_moving_time = act2_moving_distance / moving_speed;
 
 	// start actions
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
@@ -191,7 +191,7 @@ void RoadController::removeCurrentRoad_callback() {
 	}
 
 	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
-	float cur_road_height = cur_road->getBoundingBox().getMaxY() - cur_road->getBoundingBox().getMinY();
+	//float cur_road_height = cur_road->getBoundingBox().getMaxY() - cur_road->getBoundingBox().getMinY();
 	float act3_moving_distance = next_road->getPositionY();
 	float act3_moving_time = act3_moving_distance / moving_speed;
 
@@ -266,12 +266,15 @@ void RoadController::__detachLane(int how_many, int from_where) {
 
 void RoadController::removeCurrentRoad_callback_d(Ref *sender, void *d) {
 
-	float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
+	//float moving_speed = SHARED::getCurrentSpeed(SHARED::ELAPSED_TIME);
 	float resizing_ratio = *(float*)d;
 	//float next_road_height = next_road->getBoundingBox().getMaxY() - next_road->getBoundingBox().getMinY();
 	//float act2_moving_distance = next_road_height * resizing_ratio - next_road_height;
 	//float act2_moving_time = act2_moving_distance / moving_speed;
 
+    if (!hori_rails->empty())
+        removeHorizontalRail();
+    
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
 	auto act1 = ScaleBy::create(road_size_change_time, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::makeNewRoad_callback, this));
@@ -281,8 +284,9 @@ void RoadController::removeCurrentRoad_callback_d(Ref *sender, void *d) {
 
 void RoadController::makeNewRoad_callback() {
 
-	//cur_road->removeAllChildrenWithCleanup(true);
-	removeHorizontalRail();
+    if (!hori_rails->empty())
+        removeHorizontalRail();
+    
 	cur_road->removeFromParent();
 	cur_road = next_road;
 	resumeRailActionsOf(cur_road);
@@ -297,7 +301,7 @@ void RoadController::makeNewRoad_callback() {
 
 void RoadController::addRailTo(Sprite* road, int _num_lane) {
 
-	String *img_file_name = new String("");
+    std::string *img_file_name = new std::string("");
 	float size_ratio = 1.0;
 
 	switch (_num_lane) {
@@ -324,7 +328,7 @@ void RoadController::addRailTo(Sprite* road, int _num_lane) {
 			height_sum <= (road->getContentSize().height + 2 * rail_height);
 			height_sum += rail_height) {
 
-		Sprite *rail_spr = Sprite::create(img_file_name->getCString());
+		Sprite *rail_spr = Sprite::create(img_file_name->c_str());
 		rail_spr->setAnchorPoint(Point(0.5, 0.0));
 		rail_spr->setPosition(Point(road->boundingBox().size.width / 2.0, height_sum));
 		rail_spr->setScale(size_ratio);
@@ -362,7 +366,8 @@ void RoadController::pauseRailActionsOf(Sprite* road, float resizing_ratio) {
 	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
 
 		Sprite *rail_spr = (Sprite*)*it;
-		rail_spr->pauseSchedulerAndActions();
+		//rail_spr->pauseSchedulerAndActions();
+        rail_spr->pause();
 		Rect rail_spr_rect = rail_spr->getBoundingBox();
 		Rect road_spr_rect = road->getBoundingBox();
 
@@ -393,7 +398,8 @@ void RoadController::resumeRailActionsOf(Sprite* road) {
 	Vector<Node*> rail_imgs = road->getChildren();
 	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
 		Sprite *rail_spr = (Sprite*)*it;
-		rail_spr->resumeSchedulerAndActions();
+		//rail_spr->resumeSchedulerAndActions();
+        rail_spr->resume();
 		rail_spr->setVisible(true);
 	}
 }

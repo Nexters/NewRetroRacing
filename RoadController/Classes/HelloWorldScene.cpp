@@ -86,45 +86,41 @@ bool HelloWorld::init()
     auto act3 = Sequence::create(act1, act2, NULL);
     rocket->runAction(act3);
 */
-    auto bg_spr = Sprite::create("bg.png");
-    bg_spr->setAnchorPoint(Point::ZERO);
-    bg_spr->setPosition(Point::ZERO);
-    this->addChild(bg_spr);
 
     auto left_btn1 = Sprite::create("CloseSelected.png");
     left_btn1->setAnchorPoint(Point(0.5, 0.5));
     left_btn1->setPosition(Point(40, 100));
     left_btn1->setScale(2.0);
     left_btn1->setTag(LEFT_BTN_TAG1);
-    this->addChild(left_btn1);
+    this->addChild(left_btn1,3);
 
     auto left_btn2 = Sprite::create("CloseSelected.png");
 	left_btn2->setAnchorPoint(Point(0.5, 0.5));
 	left_btn2->setPosition(Point(40, 200));
 	left_btn2->setScale(2.0);
 	left_btn2->setTag(LEFT_BTN_TAG2);
-	this->addChild(left_btn2);
+	this->addChild(left_btn2,3);
 
     auto left_btn3 = Sprite::create("CloseSelected.png");
 	left_btn3->setAnchorPoint(Point(0.5, 0.5));
 	left_btn3->setPosition(Point(40, 300));
 	left_btn3->setScale(2.0);
 	left_btn3->setTag(LEFT_BTN_TAG3);
-	this->addChild(left_btn3);
+	this->addChild(left_btn3,3);
 
     auto left_btn4 = Sprite::create("CloseSelected.png");
 	left_btn4->setAnchorPoint(Point(0.5, 0.5));
 	left_btn4->setPosition(Point(40, 400));
 	left_btn4->setScale(2.0);
 	left_btn4->setTag(LEFT_BTN_TAG4);
-	this->addChild(left_btn4);
+	this->addChild(left_btn4,3);
 
     auto left_btn5 = Sprite::create("CloseSelected.png");
 	left_btn5->setAnchorPoint(Point(0.5, 0.5));
 	left_btn5->setPosition(Point(40, 500));
 	left_btn5->setScale(2.0);
 	left_btn5->setTag(LEFT_BTN_TAG5);
-	this->addChild(left_btn5);
+	this->addChild(left_btn5,3);
 
 
     auto right_btn1 = Sprite::create("CloseSelected.png");
@@ -132,42 +128,42 @@ bool HelloWorld::init()
     right_btn1->setPosition(Point(720 - 40, 100));
     right_btn1->setScale(2.0);
     right_btn1->setTag(RIGHT_BTN_TAG1);
-    this->addChild(right_btn1);
+    this->addChild(right_btn1,3);
 
     auto right_btn2 = Sprite::create("CloseSelected.png");
 	right_btn2->setAnchorPoint(Point(0.5, 0.5));
 	right_btn2->setPosition(Point(720 - 40, 200));
 	right_btn2->setScale(2.0);
 	right_btn2->setTag(RIGHT_BTN_TAG2);
-	this->addChild(right_btn2);
+	this->addChild(right_btn2,3);
 
 	auto right_btn3 = Sprite::create("CloseSelected.png");
 	right_btn3->setAnchorPoint(Point(0.5, 0.5));
 	right_btn3->setPosition(Point(720 - 40, 300));
 	right_btn3->setScale(2.0);
 	right_btn3->setTag(RIGHT_BTN_TAG3);
-	this->addChild(right_btn3);
+	this->addChild(right_btn3,3);
 
 	auto right_btn4 = Sprite::create("CloseSelected.png");
 	right_btn4->setAnchorPoint(Point(0.5, 0.5));
 	right_btn4->setPosition(Point(720 - 40, 400));
 	right_btn4->setScale(2.0);
 	right_btn4->setTag(RIGHT_BTN_TAG4);
-	this->addChild(right_btn4);
+	this->addChild(right_btn4,3);
 
 	auto right_btn5 = Sprite::create("CloseSelected.png");
 	right_btn5->setAnchorPoint(Point(0.5, 0.5));
 	right_btn5->setPosition(Point(720 - 40, 500));
 	right_btn5->setScale(2.0);
 	right_btn5->setTag(RIGHT_BTN_TAG5);
-	this->addChild(right_btn5);
+	this->addChild(right_btn5,3);
 
 	auto left_btn6 = Sprite::create("CloseSelected.png");
 	left_btn6->setAnchorPoint(Point(0.5, 0.5));
 	left_btn6->setPosition(Point(40, 1100));
 	left_btn6->setScale(2.0);
 	left_btn6->setTag(LEFT_BTN_TAG6);
-	this->addChild(left_btn6);
+	this->addChild(left_btn6,3);
 
 
     auto touch_listener = EventListenerTouchOneByOne::create();
@@ -175,6 +171,11 @@ bool HelloWorld::init()
     Director::getInstance()->getEventDispatcher()
     		->addEventListenerWithFixedPriority(touch_listener, 1);
 
+    bg_cont = new BgLayerController();
+    bg_cont->initBgLayerWithDefault();
+    bg_cont->attachBgLayerTo(this, 0);
+    bg_cont->runBgActions();
+    
     road_cont = new RoadController();
     road_cont->attachRoadLayerTo(this, 1);
 

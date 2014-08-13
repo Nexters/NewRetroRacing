@@ -3,11 +3,13 @@
 
 //
 
-#define GAME_SCENE_WIDTH 720
-#define GAME_SCENE_HEIGHT 1280
+#define GAME_SCENE_WIDTH 720.0
+#define GAME_SCENE_HEIGHT 1280.0
 
 #define SPEED_CONSTANT 10.0
 #define BASIC_SPEED 300.0
+
+#define BG_MOVING_SPEED 100.0;
 
 class SHARED {
 public:
