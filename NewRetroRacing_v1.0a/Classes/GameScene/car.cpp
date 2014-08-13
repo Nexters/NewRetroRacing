@@ -86,7 +86,7 @@ Sprite* car::getSpriteCar()
 
 void car::changeRoadMode(float _roadMinX,float _roadMaxX, int _roadNum)
 {
-	roadMinX = _roadMinX;
-	roadMaxX = _roadMaxX;
+	roadMinX = _roadMinX+sCar->getContentSize().width/2;
+	roadMaxX = _roadMaxX-sCar->getContentSize().width/2;
 	roadNum = _roadNum;
 }
