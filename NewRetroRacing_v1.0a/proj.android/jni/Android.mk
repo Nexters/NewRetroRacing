@@ -9,14 +9,15 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/HelloWorldScene.cpp \
-                   ../../Classes/GameScene/GameScene.cpp \
-                   ../../Classes/GameScene/BackgroundLayer.cpp \
-                   ../../Classes/GameScene/car.cpp \
-                   ../../Classes/GameScene/Obstacles.cpp
+                   ../../Classes/Shared.cpp \
+                   ../../Classes/GameScene.cpp \
+                   ../../Classes/BgLayerController.cpp \
+                   ../../Classes/RoadController.cpp \
+                   ../../Classes/car.cpp \
+                   ../../Classes/Obstacles.cpp
                    
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
-					$(LOCAL_PATH)/../../Classes/GameScene
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 
 LOCAL_WHOLE_STATIC_LIBRARIES := cocos2dx_static
 LOCAL_WHOLE_STATIC_LIBRARIES += cocosdenshion_static
