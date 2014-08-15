@@ -1,14 +1,9 @@
 #include "RoadController.h"
 #include "Shared.h"
 
-float road_size_change_time = 0.2;
-
 RoadController::RoadController() {
 
 	road_layer = cocos2d::Layer::create();
-
-	num_lane = 2;		// 초기 lane 갯수는 2
-	hori_rails = new Vector<Sprite*>();
 
 	// current road sprite setting
 	cur_road = cocos2d::Sprite::create("road_2560.png");
@@ -25,9 +20,17 @@ RoadController::RoadController() {
     
 	// calculate horizontal range & lane width
 	Rect road_rect = cur_road->getBoundingBox();
-	hor_range = Vec2(road_rect.getMinX(), road_rect.getMaxX());
-	lane_width = road_rect.size.width / 2; // 이 값을 어떻게 사용해야할까?
 
+    num_lane = 2;		// 초기 lane 갯수는 2
+	hori_rails = new Vector<Sprite*>();
+    
+    Shared *shared = Shared::getInstance();
+    shared->setTheNumberOfLanes(Vec2(num_lane, num_lane));
+    shared->setValidHorizontalRangeOfCar(Vec2(cur_road->getBoundingBox().getMinX(),
+                                              cur_road->getBoundingBox().getMaxX()));
+    shared->setValidHorizontalRangeOfObstacle(Vec2(cur_road->getBoundingBox().getMinX(),
+                                                   cur_road->getBoundingBox().getMaxX()));
+    
 	change_running = false;
 }
 
@@ -158,16 +161,16 @@ void RoadController::__attachLane(int how_many, int to_where) {
 	else
 		return;
 
-	Rect cur_road_rect = cur_road->getBoundingBox();
-	float cur_road_height = cur_road_rect.size.height;
-	float moving_speed = Shared::getInstance()->getCurrentSpeed();
+	//Rect cur_road_rect = cur_road->getBoundingBox();
+	//float cur_road_height = cur_road_rect.size.height;
+	//float moving_speed = Shared::getInstance()->getCurrentSpeed();
 
-	float act2_moving_distance = cur_road_height - (cur_road_height * resizing_ratio);
+	//float act2_moving_distance = cur_road_height - (cur_road_height * resizing_ratio);
 	//float act2_moving_time = act2_moving_distance / moving_speed;
 
 	// start actions
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
-	auto act1 = ScaleBy::create(road_size_change_time, resizing_ratio);
+	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::removeCurrentRoad_callback, this));
 	auto act1_3 = Sequence::create(act1, act1_2, NULL);
 	cur_road->runAction(act1_3);								// current road의 scale을 축소
@@ -271,7 +274,7 @@ void RoadController::removeCurrentRoad_callback_d(Ref *sender, void *d) {
         removeHorizontalRail();
     
 	//auto act1 = ScaleBy::create(act2_moving_time, resizing_ratio);
-	auto act1 = ScaleBy::create(road_size_change_time, resizing_ratio);
+	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::makeNewRoad_callback, this));
 	auto act1_3 = Sequence::create(act1, act1_2, NULL);				// RoadController::makeNewRoad_callback
 	next_road->runAction(act1_3);

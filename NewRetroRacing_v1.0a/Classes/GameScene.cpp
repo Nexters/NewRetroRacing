@@ -306,52 +306,52 @@ bool GameScene::buttonTouched(Touch *touch) {
     
 	if (left_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN1 TOUCHED!!");
-		road_cont->attachLane(1, 1);
+		road_cont->attachLane(1, 1);    // 왼쪽에 한줄 추가
 		return true;
 	}
 	else if (left_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN2 TOUCHED!!");
-		road_cont->attachLane(1, 2);
+		road_cont->attachLane(1, 2);    // 오른쪽에 한줄 추가
 		return true;
 	}
 	else if (left_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN3 TOUCHED!!");
-		road_cont->attachLane(2, 1);
+		road_cont->attachLane(2, 1);    // 왼쪽에 두줄 추가
 		return true;
 	}
 	else if (left_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN4 TOUCHED!!");
-		road_cont->attachLane(2, 2);
+		road_cont->attachLane(2, 2);    // 오른쪽에 두줄 추가
 		return true;
 	}
 	else if (left_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN5 TOUCHED!!");
-		road_cont->attachLane(2, 3);
+		road_cont->attachLane(2, 3);    // 양쪽에 한줄씩 추가
 		return true;
 	}
 	else if (right_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN1 TOUCHED!!");
-		road_cont->detachLane(1, 1);
+		road_cont->detachLane(1, 1);    // 왼쪽에 한줄 삭제
 		return true;
 	}
 	else if (right_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN2 TOUCHED!!");
-		road_cont->detachLane(1, 2);
+		road_cont->detachLane(1, 2);    // 오른쪽에 한줄 삭제
 		return true;
 	}
 	else if (right_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN3 TOUCHED!!");
-		road_cont->detachLane(2, 1);
+		road_cont->detachLane(2, 1);    // 왼쪽에 두줄 삭제
 		return true;
 	}
 	else if (right_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN4 TOUCHED!!");
-		road_cont->detachLane(2, 2);
+		road_cont->detachLane(2, 2);    // 오른쪽에 두줄 삭제
 		return true;
 	}
 	else if (right_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN5 TOUCHED!!");
-		road_cont->detachLane(2, 3);
+		road_cont->detachLane(2, 3);    // 양쪽에 한줄씩 삭제
 		return true;
 	}
 	else if (left_btn6_rect.containsPoint(touch_location)) {

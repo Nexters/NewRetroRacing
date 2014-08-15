@@ -35,8 +35,6 @@ private:
 	Sprite *cur_road;		// 현재 화면 상에 나타나는 road sprite(사실상 불투명 직사각형 영). 이 sprite 위에 rail sprite들이 붙여지고 action이 가해진다.
 	Sprite *next_road;		// road의 lane 갯수가 달라질 때, 화면 위에서 내려오는 다음 road sprite.
 	int num_lane;			// the number of lanes
-	Vec2 hor_range;			// Horizontal range
-	float lane_width;
 	bool change_running;	// Locking variable for Actions(changing the number of lanes)
 	Vector<Sprite*> *hori_rails;
 };
