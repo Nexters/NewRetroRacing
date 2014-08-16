@@ -1,4 +1,5 @@
 #include "car.h"
+#include "Shared.h"
 
 
 car::car(std::string name, std::string _carSpriteFileName)
@@ -7,6 +8,7 @@ car::car(std::string name, std::string _carSpriteFileName)
 	sCar = Sprite::create(_carSpriteFileName);
 	sCar->setAnchorPoint(Vec2(0.5,0.5));
 	carSize = sCar->getContentSize();
+	
 
 	actionCount = 0;
 
@@ -84,9 +86,21 @@ Sprite* car::getSpriteCar()
 	return this->sCar;
 }
 
-void car::changeRoadMode(float _roadMinX,float _roadMaxX, int _roadNum)
+void car::changeRoadMode(float _roadMinX,float _roadMaxX,int currRoadNum, int changedRoadNum)
 {
 	roadMinX = _roadMinX+sCar->getContentSize().width/2;
 	roadMaxX = _roadMaxX-sCar->getContentSize().width/2;
-	roadNum = _roadNum;
+	roadNum = changedRoadNum;
+	moveLength = (_roadMaxX-_roadMinX)/changedRoadNum;
+	ScaleBy* act1 = ScaleBy::create(RELOCATION_TIME,(float)currRoadNum/(float)changedRoadNum);
+	sCar->runAction(act1);
+}
+
+float car::getMinX()
+{
+	return roadMinX;
+}
+float car::getMaxX()
+{
+	return roadMaxX;
 }

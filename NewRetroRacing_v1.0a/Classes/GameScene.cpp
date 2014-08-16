@@ -56,13 +56,14 @@ bool GameScene::init()
 // update elpased time
     this->schedule(schedule_selector(GameScene::updateElpasedTime), 5.0);
 
-/*
+
 // about Car
     playerCar = new car("default","rocket.png");
 	playerCar->addOnRoad(this);
-	playerCar->setMoveLength(230);
+	playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber);
 	this->scheduleUpdate();
-*/
+
     
 // test buttons
     attachTestButtons();
@@ -83,6 +84,7 @@ void GameScene::initGameSceneData() {
     isTouchDown=false;
 	initTouchPos[0]=0;
 	initTouchPos[1]=0;
+	roadLineNumber=2;
     
     auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -141,7 +143,7 @@ void GameScene::update(float dt) {
 		{
 			float leftsize = playerCar->getCarPosition().x;
 			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (leftsize <= 260 || running>0)
+			if (leftsize <= playerCar->getMinX() || running>0)
 			{
 
 			}
@@ -156,7 +158,7 @@ void GameScene::update(float dt) {
 		{
 			float rightsize = playerCar->getCarPosition().x;
 			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (rightsize >= 430 || running>0)
+			if (rightsize >= playerCar->getMaxX() || running>0)
 			{
 
 			}
@@ -307,51 +309,111 @@ bool GameScene::buttonTouched(Touch *touch) {
 	if (left_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN1 TOUCHED!!");
 		road_cont->attachLane(1, 1);    // 왼쪽에 한줄 추가
+		if(roadLineNumber<4)
+		{
+			roadLineNumber++;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber);
+		}
 		return true;
 	}
 	else if (left_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN2 TOUCHED!!");
 		road_cont->attachLane(1, 2);    // 오른쪽에 한줄 추가
+		if(roadLineNumber<4)
+		{
+			roadLineNumber++;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber);
+		}
 		return true;
 	}
 	else if (left_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN3 TOUCHED!!");
 		road_cont->attachLane(2, 1);    // 왼쪽에 두줄 추가
+		if(roadLineNumber<3)
+		{
+			roadLineNumber+=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		}
 		return true;
 	}
 	else if (left_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN4 TOUCHED!!");
 		road_cont->attachLane(2, 2);    // 오른쪽에 두줄 추가
+		if(roadLineNumber<3)
+		{
+			roadLineNumber+=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		}
 		return true;
 	}
 	else if (left_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN5 TOUCHED!!");
 		road_cont->attachLane(2, 3);    // 양쪽에 한줄씩 추가
+		if(roadLineNumber<3)
+		{
+			roadLineNumber+=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		}
 		return true;
 	}
 	else if (right_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN1 TOUCHED!!");
 		road_cont->detachLane(1, 1);    // 왼쪽에 한줄 삭제
+		if(roadLineNumber>2)
+		{
+			roadLineNumber--;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber);
+		}
 		return true;
 	}
 	else if (right_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN2 TOUCHED!!");
 		road_cont->detachLane(1, 2);    // 오른쪽에 한줄 삭제
+		if(roadLineNumber>2)
+		{
+			roadLineNumber--;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber);
+		}
 		return true;
 	}
 	else if (right_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN3 TOUCHED!!");
 		road_cont->detachLane(2, 1);    // 왼쪽에 두줄 삭제
+		if(roadLineNumber>=4)
+		{
+			roadLineNumber-=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber);
+		}
 		return true;
 	}
 	else if (right_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN4 TOUCHED!!");
 		road_cont->detachLane(2, 2);    // 오른쪽에 두줄 삭제
+		if(roadLineNumber>=4)
+		{
+			roadLineNumber-=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber);
+		}
 		return true;
 	}
 	else if (right_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN5 TOUCHED!!");
 		road_cont->detachLane(2, 3);    // 양쪽에 한줄씩 삭제
+		if(roadLineNumber>=4)
+		{
+			roadLineNumber-=2;
+			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber);
+		}
 		return true;
 	}
 	else if (left_btn6_rect.containsPoint(touch_location)) {

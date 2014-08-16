@@ -25,8 +25,6 @@ public:
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
-<<<<<<< HEAD:NewRetroRacing_v1.0a/Classes/GameScene/GameScene.h
-
     void makeObstacles(float delta);
 	void initLabel();
 
@@ -35,11 +33,6 @@ public:
 
 	Size visibleSize;
 	int coin;
-
-	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
-=======
-    
-private:
     
     void initGameSceneData();
     void gameOver(float delta);
@@ -47,7 +40,6 @@ private:
     void updateElpasedTime(float delta);
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
->>>>>>> origin/master:NewRetroRacing_v1.0a/Classes/GameScene.h
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
@@ -64,7 +56,7 @@ private:
     RoadController* road_cont;
     car* playerCar;
 
-    
+    int roadLineNumber;
     bool isTouchDown;
     float initTouchPos[2];
 	float currTouchPos[2];
