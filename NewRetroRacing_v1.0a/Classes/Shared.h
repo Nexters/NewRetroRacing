@@ -28,8 +28,8 @@ public:
     float getCurrentSpeed();
     float getScreenSizeRatio();
     float getCurrentElapsedTime();
-    Vec2 getValidHorizontalRnageOfCar();
-    Vec2 getValidHorizontalRnageOfObstacle();
+    Vec2 getValidHorizontalRangeOfCar();
+    Vec2 getValidHorizontalRangeOfObstacle();
     Vec2 getTheNumberOfLanes();
     
     void setScreenSizeRatio(float ratio);

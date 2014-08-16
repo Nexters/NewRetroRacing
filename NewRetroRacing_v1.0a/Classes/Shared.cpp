@@ -42,12 +42,12 @@ float Shared::getCurrentElapsedTime() {
     return elapsed_time;
 }
 
-Vec2 Shared::getValidHorizontalRnageOfCar() {
+Vec2 Shared::getValidHorizontalRangeOfCar() {
     
     return car_valid_range;
 }
 
-Vec2 Shared::getValidHorizontalRnageOfObstacle() {
+Vec2 Shared::getValidHorizontalRangeOfObstacle() {
     
     return obs_valid_range;
 }

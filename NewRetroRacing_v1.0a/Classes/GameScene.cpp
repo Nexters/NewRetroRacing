@@ -75,7 +75,7 @@ void GameScene::initGameSceneData() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Shared* shared = Shared::getInstance();
     shared->resetGameSceneData();
-    shared->setScreenSizeRatio(visibleSize.width / 720.0);
+    shared->setScreenSizeRatio(visibleSize.width / GAME_SCENE_WIDTH);
     this->setAnchorPoint(Point::ZERO);
     this->setPosition(Point::ZERO);
     this->setScale(shared->getScreenSizeRatio());
@@ -266,7 +266,7 @@ bool GameScene::buttonTouched(Touch *touch) {
         return false;
     
     Point touch_location = touch->getLocation();
-	touch_location = touch_location / Shared::getInstance()->getScreenSizeRatio();
+	touch_location = Shared::getInstance()->adjustPoint(touch_location);
     
 	Sprite *left_btn1 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG1);
 	Rect left_btn1_rect = left_btn1->getBoundingBox();
