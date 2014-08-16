@@ -33,7 +33,7 @@ public:
 
 	void setMoveLength(float _moveLegnth);
 
-	void changeRoadMode(float _roadMinX,float _roadMaxX, int _roadNum);//set
+	void changeRoadMode(float _roadMinX,float _roadMaxX,int currRoadNum, int changedRoadNum);//set
 
 	float getMinX();
 	float getMaxX();
