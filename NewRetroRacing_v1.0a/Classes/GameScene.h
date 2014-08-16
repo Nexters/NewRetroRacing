@@ -6,9 +6,10 @@
 
 
 #include "cocos2d.h"
+#include "Shared.h"
+#include "RoadController.h"
+#include "BgLayerController.h"
 #include "car.h"
-#include "Obstacles.h"
-#include "BackgroundLayer.h"
 
 class GameScene : public cocos2d::Layer
 {
@@ -24,6 +25,7 @@ public:
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
+<<<<<<< HEAD:NewRetroRacing_v1.0a/Classes/GameScene/GameScene.h
 
     void makeObstacles(float delta);
 	void initLabel();
@@ -35,21 +37,37 @@ public:
 	int coin;
 
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+=======
+    
+private:
+    
+    void initGameSceneData();
+    void gameOver(float delta);
+    
+    void updateElpasedTime(float delta);
+    
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+>>>>>>> origin/master:NewRetroRacing_v1.0a/Classes/GameScene.h
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
+    
+    void update(float dt);
+    
+    /* for test */
+    void attachTestButtons();
+    bool buttonTouched(Touch *touch);
+    /* ******** */
+    
+private:
+    BgLayerController *bg_cont;
+    RoadController* road_cont;
+    car* playerCar;
 
-	bool isTouchDown;
-
-	float initTouchPos[2];
+    
+    bool isTouchDown;
+    float initTouchPos[2];
 	float currTouchPos[2];
-
-	car* playerCar;
-	Obstacles *obstacles;
-
-	void gameOver(float delta);
-
-	void update(float dt);
 };
 
 #endif // __GAME_SCENE_H__
