@@ -265,8 +265,7 @@ bool GameScene::buttonTouched(Touch *touch) {
     if (road_cont == NULL)
         return false;
     
-    Point touch_location = touch->getLocation();
-	touch_location = Shared::getInstance()->adjustPoint(touch_location);
+    Point touch_location = Shared::getInstance()->adjustPoint(touch->getLocation());
     
 	Sprite *left_btn1 = (Sprite*)this->getChildByTag(LEFT_BTN_TAG1);
 	Rect left_btn1_rect = left_btn1->getBoundingBox();

@@ -52,7 +52,7 @@ Vec2 Shared::getValidHorizontalRangeOfObstacle() {
     return obs_valid_range;
 }
 
-Vec2 Shared::getTheNumberOfLanes() {
+float Shared::getTheNumberOfLanes() {
     
     return num_of_lanes;
 }
@@ -72,7 +72,7 @@ void Shared::setValidHorizontalRangeOfObstacle(Vec2 range) {
     obs_valid_range = range;
 }
 
-void Shared::setTheNumberOfLanes(Vec2 _num_of_lanes) {
+void Shared::setTheNumberOfLanes(float _num_of_lanes) {
     
     num_of_lanes =  _num_of_lanes;
 }
@@ -90,7 +90,7 @@ void Shared::resetGameSceneData() {
     current_speed = BASIC_SPEED;
     car_valid_range = Vec2::ZERO;
     obs_valid_range = Vec2::ZERO;
-    num_of_lanes = Vec2::ZERO;
+    num_of_lanes = 0;
 }
 
 void Shared::resetElapsedTime() {
@@ -105,7 +105,7 @@ Shared::Shared() {
     current_speed = BASIC_SPEED;
     car_valid_range = Vec2::ZERO;
     obs_valid_range = Vec2::ZERO;
-    num_of_lanes = Vec2::ZERO;
+    num_of_lanes = 0;
 }
 
 Shared::~Shared() {

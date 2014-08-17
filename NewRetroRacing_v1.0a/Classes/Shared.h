@@ -30,12 +30,12 @@ public:
     float getCurrentElapsedTime();
     Vec2 getValidHorizontalRangeOfCar();
     Vec2 getValidHorizontalRangeOfObstacle();
-    Vec2 getTheNumberOfLanes();
+    float getTheNumberOfLanes();
     
     void setScreenSizeRatio(float ratio);
     void setValidHorizontalRangeOfCar(Vec2 range);
     void setValidHorizontalRangeOfObstacle(Vec2 range);
-    void setTheNumberOfLanes(Vec2 _num_of_lanes);
+    void setTheNumberOfLanes(float _num_of_lanes);
     void incrementElapsedTime(int sec);
     
     void resetGameSceneData();
@@ -56,8 +56,7 @@ private:
     Vec2 car_valid_range;
     Vec2 obs_valid_range;
     
-    Vec2 num_of_lanes;  // num_of_lanes.x: the number of current lanes
-                        // num_of_lanes.y: the number of next lanes
+    unsigned int num_of_lanes;
 };
 
 #endif /* CONSTANTS_H_ */
