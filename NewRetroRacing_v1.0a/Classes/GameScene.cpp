@@ -61,7 +61,7 @@ bool GameScene::init()
     playerCar = new car("default","rocket.png");
 	playerCar->addOnRoad(this);
 	playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber,0);
 	this->scheduleUpdate();
 
     
@@ -313,7 +313,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber++;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber,1);
 		}
 		return true;
 	}
@@ -324,7 +324,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber++;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-1, roadLineNumber,-1);
 		}
 		return true;
 	}
@@ -335,7 +335,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber+=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber,1);
 		}
 		return true;
 	}
@@ -346,7 +346,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber+=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber,-1);
 		}
 		return true;
 	}
@@ -357,7 +357,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber+=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber-2, roadLineNumber,0);
 		}
 		return true;
 	}
@@ -368,7 +368,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber--;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber,1);
 		}
 		return true;
 	}
@@ -379,7 +379,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber--;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+1, roadLineNumber,-1);
 		}
 		return true;
 	}
@@ -390,7 +390,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber-=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber,1);
 		}
 		return true;
 	}
@@ -401,7 +401,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber-=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber,-1);
 		}
 		return true;
 	}
@@ -412,7 +412,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 		{
 			roadLineNumber-=2;
 			playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
-		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber);
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber+2, roadLineNumber,0);
 		}
 		return true;
 	}

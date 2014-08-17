@@ -86,14 +86,31 @@ Sprite* car::getSpriteCar()
 	return this->sCar;
 }
 
-void car::changeRoadMode(float _roadMinX,float _roadMaxX,int currRoadNum, int changedRoadNum)
+void car::changeRoadMode(float _roadMinX,float _roadMaxX,int currRoadNum, int changedRoadNum, int dir)
 {
 	roadMinX = _roadMinX+sCar->getContentSize().width/2;
 	roadMaxX = _roadMaxX-sCar->getContentSize().width/2;
 	roadNum = changedRoadNum;
 	moveLength = (_roadMaxX-_roadMinX)/changedRoadNum;
-	ScaleBy* act1 = ScaleBy::create(RELOCATION_TIME,(float)currRoadNum/(float)changedRoadNum);
+	ScaleBy* act1;
+	if(dir==-1)
+	{//오른쪽으로 늘어날때
+		sCar->setAnchorPoint(Vec2(0,0.5));
+		act1 = ScaleBy::create(RELOCATION_TIME,(float)currRoadNum/(float)changedRoadNum);
+	}
+	else if(dir==0)
+	{
+		sCar->setAnchorPoint(Vec2(0.5,0.5));
+		act1 = ScaleBy::create(RELOCATION_TIME,(float)currRoadNum/(float)changedRoadNum);
+	}
+	else if(dir==1)
+	{//왼쪽으로 늘어날때
+		sCar->setAnchorPoint(Vec2(1,0.5));
+		act1 = ScaleBy::create(RELOCATION_TIME,(float)currRoadNum/(float)changedRoadNum);
+	}
+	
 	sCar->runAction(act1);
+	//sCar->setAnchorPoint(Vec2(0.5,0.5));
 }
 
 float car::getMinX()
