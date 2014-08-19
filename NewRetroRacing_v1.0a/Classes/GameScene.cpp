@@ -63,7 +63,8 @@ bool GameScene::init()
 	playerCar->changeRoadMode(Shared::getInstance()->getValidHorizontalRnageOfCar().x,
 		Shared::getInstance()->getValidHorizontalRnageOfCar().y, roadLineNumber, roadLineNumber,0);
 	this->scheduleUpdate();
-
+	CCLog("%lf %lf",Shared::getInstance()->getValidHorizontalRnageOfCar().x,
+		Shared::getInstance()->getValidHorizontalRnageOfCar().y);
     
 // test buttons
     attachTestButtons();
@@ -136,7 +137,8 @@ void GameScene::update(float dt) {
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
+	CCLog("min : %lf, max : %lf, moveL : %lf",playerCar->getMinX(),playerCar->getMaxX(),playerCar->moveLength);
+	CCLog("carPos : x=%lf",playerCar->getCarPosition().x);
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
@@ -153,6 +155,7 @@ void GameScene::update(float dt) {
 				playerCar->moveLeft();
 			}
 			isTouchDown=false;
+			playerCar->getSpriteCar()->setAnchorPoint(Vec2(0.5,0.5));
 		}
 		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
 		{
@@ -168,6 +171,7 @@ void GameScene::update(float dt) {
 				playerCar->moveRight();
 			}
 			isTouchDown=false;
+			playerCar->getSpriteCar()->setAnchorPoint(Vec2(0.5,0.5));
 		}
 	}
 }

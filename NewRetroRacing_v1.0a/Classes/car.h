@@ -35,19 +35,23 @@ public:
 
 	void changeRoadMode(float _roadMinX,float _roadMaxX,int currRoadNum, int changedRoadNum,int dir);//set
 
+	void setPositionCorrect(int fromRoad, int toRoad);
+
 	float getMinX();
 	float getMaxX();
 
+	float moveLength;//move size of road
 private:
 	//status for car
 	string carName; // car Name
 	string carSpriteFileName;
 	Sprite* sCar;//car Sprite
 	Size carSize;
-	float moveLength;//move size of road
-	int actionCount;
+	
 	
 	int roadNum;
 	float roadMinX;
 	float roadMaxX;
+
+	int currLine;
 };
