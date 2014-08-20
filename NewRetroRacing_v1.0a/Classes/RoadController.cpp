@@ -1,7 +1,7 @@
 #include "RoadController.h"
 #include "Shared.h"
 
-Shared *shared = NULL;
+#define RAIL_HEIGHT 250.0
 
 RoadController::RoadController() {
 
@@ -27,7 +27,7 @@ RoadController::RoadController() {
     
 	hori_rails = new Vector<Sprite*>();
     
-    shared = Shared::getInstance();
+    Shared *shared = Shared::getInstance();
     shared->setTheNumberOfLanes(num_lane);
     shared->setValidHorizontalRangeOfCar(Vec2(cur_road->getBoundingBox().getMinX(),
                                               cur_road->getBoundingBox().getMaxX()));
@@ -137,9 +137,9 @@ void RoadController::__attachLane(int how_many, int to_where) {
 	// calculate resizing ratio of current road sprite & add rail sprites to next road sprite.
 	float resizing_ratio = (float)num_lane / (num_lane + how_many);
 	addRailTo(next_road, num_lane + how_many);
-	pauseRailActionsOf(next_road, resizing_ratio);
+	pauseRailActionsOfNextRoad(next_road);
                     // Because addRailTo function start actions of rail sprites,
-	pauseRailActionsOf(cur_road, resizing_ratio);
+	pauseRailActionsOfCurrentRoad(cur_road, resizing_ratio);
                     // you should pause the actions until process of attachLanes is over.
 
 	// set basic values for attaching Lane(s)
@@ -165,6 +165,9 @@ void RoadController::__attachLane(int how_many, int to_where) {
 	}
 	else
 		return;
+    
+    // >> 여기서 Spaceship의 relocation이 필요하다. (attach lanes)
+//    ship->relocateShip(how_many, to_where);
 
 	// start actions
 	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
@@ -186,11 +189,8 @@ void RoadController::removeCurrentRoad_callback() {
 	}
     
     // 작아진 길에서 Car가 움직일 수 있는 가로 범위 설정
-    shared = Shared::getInstance();
+    Shared *shared = Shared::getInstance();
     shared->setValidHorizontalRangeOfCar(Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
-    CCLOG("range %f %f",
-          shared->getValidHorizontalRangeOfCar().x,
-          shared->getValidHorizontalRangeOfCar().y);
 
 	float moving_speed = Shared::getInstance()->getCurrentSpeed();
 	float act3_moving_distance = next_road->getPositionY();
@@ -211,8 +211,8 @@ void RoadController::__detachLane(int how_many, int from_where) {
 
 	float resizing_ratio = (float)num_lane / (num_lane - how_many);
 	addRailTo(next_road, num_lane - how_many);
-	pauseRailActionsOf(next_road, resizing_ratio);
-	pauseRailActionsOf(cur_road, resizing_ratio);
+	pauseRailActionsOfNextRoad(next_road);
+	pauseRailActionsOfCurrentRoad(cur_road, resizing_ratio);
 
 	if (from_where == 1) {
 		next_road->setAnchorPoint(Point(1.0, 0.0));
@@ -270,6 +270,9 @@ void RoadController::removeCurrentRoad_callback_d(Ref *sender, void *d) {
     if (!hori_rails->empty())
         removeHorizontalRail();
     
+    // >> 여기서 Spaceship의 relocation이 필요하다. (detach lanes)
+//    ship->relocateShip(-lc, w);
+    
 	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::makeNewRoad_callback, this));
 	auto act1_3 = Sequence::create(act1, act1_2, NULL);		// RoadController::makeNewRoad_callback
@@ -287,11 +290,8 @@ void RoadController::makeNewRoad_callback() {
     
     // 새로운 길에서 Car가 움직일 수 있는 가로 범위 설정
     Rect cur_road_rect = cur_road->getBoundingBox();
-    shared = Shared::getInstance();
+    Shared *shared = Shared::getInstance();
     shared->setValidHorizontalRangeOfCar(Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
-    CCLOG("range %f %f",
-          shared->getValidHorizontalRangeOfCar().x,
-          shared->getValidHorizontalRangeOfCar().y);
 
 	next_road = cocos2d::Sprite::create("road_2560.png");
 	next_road->setAnchorPoint(Point(0.5, 0.0));
@@ -323,7 +323,7 @@ void RoadController::addRailTo(Sprite* road, int _num_lane) {
 		return;
 	}
 
-	float rail_height = Sprite::create("rail_2.png")->getContentSize().height;
+	float rail_height = RAIL_HEIGHT;
 	rail_height *= size_ratio;
 
 	for (float height_sum = 0.0;
@@ -359,10 +359,23 @@ void RoadController::railAction_callback(Ref *_rail_spr, Ref* _road) {
 	rail_spr->runAction(act3);
 }
 
-void RoadController::pauseRailActionsOf(Sprite* road, float resizing_ratio) {
+void RoadController::pauseRailActionsOfNextRoad(Sprite* road) {
+ 
+    Vector<Node*> rail_imgs = road->getChildren();
+    
+	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
+        
+		Sprite *rail_spr = (Sprite*)*it;
+        rail_spr->pause();
+		Rect rail_spr_rect = rail_spr->getBoundingBox();
+		Rect road_spr_rect = road->getBoundingBox();
+	}
+}
+
+void RoadController::pauseRailActionsOfCurrentRoad(Sprite* road, float resizing_ratio) {
 
 	Vector<Node*> rail_imgs = road->getChildren();
-	float new_next_position_y = 1280+250+10;
+	float new_next_position_y = GAME_SCENE_HEIGHT + RAIL_HEIGHT + 10;
 
 	for (std::vector<Node*>::iterator it = rail_imgs.begin(); it != rail_imgs.end(); ++it) {
 
@@ -371,15 +384,13 @@ void RoadController::pauseRailActionsOf(Sprite* road, float resizing_ratio) {
 		Rect rail_spr_rect = rail_spr->getBoundingBox();
 		Rect road_spr_rect = road->getBoundingBox();
 
-		// road == cur_road 라는 조건은, pauseRailActionsOf func가 cur_road가 사라질 때 호출되는 경우를 말한다.
-		if (road == cur_road && resizing_ratio < 1.0 &&
+		if (resizing_ratio < 1.0 &&
 			rail_spr_rect.getMinY() * resizing_ratio >= GAME_SCENE_HEIGHT) {
 			if (rail_spr_rect.getMinY() * resizing_ratio < new_next_position_y)
 				new_next_position_y = rail_spr_rect.getMinY() * resizing_ratio;
 			rail_spr->setVisible(false);
 		}
-		else if (road == cur_road && resizing_ratio >= 1.0 &&
-			rail_spr_rect.getMinY() >= GAME_SCENE_HEIGHT) {
+		else if (resizing_ratio >= 1.0 && rail_spr_rect.getMinY() >= GAME_SCENE_HEIGHT) {
 			if (rail_spr_rect.getMinY() < new_next_position_y)
 				new_next_position_y = rail_spr_rect.getMinY();
 			rail_spr->setVisible(false);
@@ -388,9 +399,7 @@ void RoadController::pauseRailActionsOf(Sprite* road, float resizing_ratio) {
 
 		}
 	}
-	if (road == cur_road) {
-		next_road->setPositionY(new_next_position_y);
-	}
+    next_road->setPositionY(new_next_position_y);
 }
 
 void RoadController::resumeRailActionsOf(Sprite* road) {
