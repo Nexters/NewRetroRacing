@@ -1,8 +1,8 @@
 #ifndef _SPACESHIP_H_
 #define _SPACESHIP_H_
 
-#include <iostream>
 #include "cocos2d.h"
+#include "RoadChangeObserver.h"
 
 #define LEFT_MARGIN 100.0
 #define RAIL_WIDTH 30.0
@@ -10,25 +10,23 @@
 #define INITIAL_X (LEFT_MARGIN + RAIL_WIDTH + 115.0)
 #define INITIAL_Y 100.0
 
-
-
 USING_NS_CC;
 
-class Spaceship {
+class Spaceship : public RoadChangeObserver {
     
 public:
     Spaceship(int ship_num);
-    virtual ~Spaceship();
+    ~Spaceship();
     
     void attachShipTo(Layer* layer, int zOrder);
     
-    Sprite* getSpaceshipSprite();
+    virtual void onLaneIncrement(int how_many, int to_where);
+    virtual void onLaneDecrement(int how_many, int from_where);
     
-    void setScheduler();
-    
-    bool relocateShip(int lane_change, int where);
+    virtual void onVerticalRangeChange(Vec2 range);
     
 private:
+    void relocateShip(int lane_change, int where);
     float getXPositionOfShip(int lane_num);
     void abc(float delta);
     

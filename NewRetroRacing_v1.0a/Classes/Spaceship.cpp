@@ -1,6 +1,6 @@
 #include "Spaceship.h"
-#include <string>
 #include "Shared.h"
+#include <string>
 
 using namespace std;
 
@@ -17,6 +17,8 @@ Spaceship::Spaceship(int ship_num) {
             break;
     }
     
+    this->setObserverType(spaceship_type);
+    
     num_lane = 2;
     cur_lane_num = 0;
     ratio = 1.0;
@@ -27,16 +29,41 @@ Spaceship::Spaceship(int ship_num) {
     ship->setAnchorPoint(Point(0.5, 0.5));
     ship->setPosition(Point(getXPositionOfShip(cur_lane_num), INITIAL_Y));
 }
+Spaceship::~Spaceship() {
+    
+}
 
-bool Spaceship::relocateShip(int lane_change, int where) {
+void Spaceship::attachShipTo(Layer* layer, int zOrder) {
+    
+    if (ship == NULL || layer == NULL) {
+        return;
+    }
+    
+    layer->addChild(ship, zOrder);
+}
+
+void Spaceship::onLaneIncrement(int how_many, int to_where) {
+    
+    relocateShip(how_many, to_where);
+}
+void Spaceship::onLaneDecrement(int how_many, int from_where) {
+    
+    relocateShip(-how_many, from_where);
+}
+
+void Spaceship::onVerticalRangeChange(Vec2 range) {
+    
+}
+
+void Spaceship::relocateShip(int lane_change, int where) {
     
     // |   |   |   |   | <= Lanes
     //   0   1   2   3   <= Lane number
   
     if (num_lane + lane_change < 2)
-        return false;
+        return ;
     if (num_lane + lane_change > 4)
-        return false;
+        return ;
     
     ratio = 2.0 / (num_lane + lane_change);
     int next_lane_num = cur_lane_num;
@@ -46,7 +73,7 @@ bool Spaceship::relocateShip(int lane_change, int where) {
     if (lane_change == 1 || lane_change == 2) {
         
         if (where == 3 && lane_change == 1)
-            return false;
+            return ;
         
         if (where == 1 || where == 3) {     // 왼쪽에 lane이 하나 추가되는 경우 or 양쪽에 lane이 하나씩 추가되는경우
             next_lane_num += 1;
@@ -55,14 +82,14 @@ bool Spaceship::relocateShip(int lane_change, int where) {
     else if (lane_change == -1 || lane_change == -2) {
     
         if (where == 3 && lane_change == -1)
-            return false;
+            return ;
         
         if (where == 1 || where == 3) {
             next_lane_num -= 1;
         }
     }
     else {
-        return false;
+        return ;
     }
     
     float x_pos = getXPositionOfShip(next_lane_num);
@@ -74,24 +101,7 @@ bool Spaceship::relocateShip(int lane_change, int where) {
     
     num_lane += lane_change;
     cur_lane_num = next_lane_num;
-   
-    return true;
 }
-
-void Spaceship::attachShipTo(Layer* layer, int zOrder) {
-    
-    if (ship == NULL || layer == NULL) {
-        return;
-    }
-        
-    layer->addChild(ship, zOrder);
-}
-
-void Spaceship::setScheduler() {
-    
-    Director::getInstance()->getScheduler()->schedule(std::bind(&Spaceship::abc, this, std::placeholders::_1), this, 1.0, false, "a");
-}
-
 float Spaceship::getXPositionOfShip(int lane_num) {
     
     float x_pos = LEFT_MARGIN + (RAIL_WIDTH * ratio) + (distance / 2);
@@ -101,14 +111,19 @@ float Spaceship::getXPositionOfShip(int lane_num) {
     return x_pos;
 }
 
+
+
+/*void Spaceship::setScheduler() {
+    
+    Director::getInstance()->getScheduler()->schedule(std::bind(&Spaceship::abc, this, std::placeholders::_1), this, 1.0, false, "a");
+}
 void Spaceship::abc(float delta) {
     
     CCLOG("AAA");
 }
+ */
 
-Spaceship::~Spaceship() {
-    
-}
+
 
 /*
 

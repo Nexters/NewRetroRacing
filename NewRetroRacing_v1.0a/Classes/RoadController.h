@@ -2,9 +2,10 @@
 #define ROADCONTROLLER_H_
 
 #include "cocos2d.h"
-#include "Spaceship.h"
+#include "RoadChangeObserver.h"
 
 USING_NS_CC;
+using namespace std;
 
 class RoadController {
 
@@ -16,6 +17,9 @@ public:
 
 	bool attachLane(int how_many, int to_where);
 	bool detachLane(int how_many, int from_where);
+    
+    void addRoadChangeObserver(RoadChangeObserver *observer);
+    void removeRoadChangeObserver(RoadChangeObserver *observer);
 
 private:
     
@@ -31,7 +35,7 @@ private:
             void __detach_scaleNextRoadAfterMovingRoads(Ref* sender, void* ratio);
                 void __detach_makeNewRoadAfterScalingNextRoad();
     
-	void addRailTo(Sprite* road, int _num_lane);
+    void addRailTo(Sprite* road, int _num_lane);
     void railAction_callback(Ref* _rail_spr, Ref* _road);
     
     void pauseRailActionsOfNextRoad(Sprite* n_road);
@@ -41,22 +45,31 @@ private:
 	void addHorizontalRailTo(Sprite* road, int _num_lane, int lane_num);
 	void removeHorizontalRail();
     
-    ~RoadController();
+private:
+    void notifyLaneIncrement();
+    void notifyLaneDecrement();
     
 private:
     void setChangeRunningFlag();
     void unsetChangeRunningFlag();
     bool getChangeRunningFlag();
+    
+private:
+    ~RoadController();
 
 private:
 	Layer *road_layer;
 	Sprite *cur_road;
 	Sprite *next_road;
 	Vector<Sprite*> *hori_rails;
+    vector<RoadChangeObserver*> *observers;
     
 	int lane_count;
 	bool change_running;
-
+    
+private:
+    int tmp_how_many;
+    int tmp_where;
 };
 
 #endif

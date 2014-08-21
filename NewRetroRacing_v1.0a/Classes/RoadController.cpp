@@ -27,6 +27,10 @@ RoadController::RoadController() {
     
 	hori_rails = new Vector<Sprite*>();
     
+    observers = new vector<RoadChangeObserver*>();
+    tmp_how_many = 0;
+    tmp_where = 0;
+    
 	unsetChangeRunningFlag();
 }
 void RoadController::release() {
@@ -124,6 +128,21 @@ bool RoadController::detachLane(int how_many, int from_where) {
 	}
 }
 
+void RoadController::addRoadChangeObserver(RoadChangeObserver *observer) {
+    
+    observers->push_back(observer);
+}
+void RoadController::removeRoadChangeObserver(RoadChangeObserver *observer) {
+    
+    for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
+		RoadChangeObserver *entry = (RoadChangeObserver*)*it;
+		if (entry == observer) {
+            observers->erase(it);
+            return;
+        }
+	}
+}
+
 /*
  * sub functions of attachLane function
  */
@@ -134,6 +153,8 @@ void RoadController::__attachLane(int how_many, int to_where) {
     // change_running 이라는 flag를 true로 설정해서 중복적으로 호출되지 않도록 한다.
     
 	float resizing_ratio = (float)lane_count / (lane_count + how_many);
+    tmp_how_many = how_many;
+    tmp_where = to_where;
 	
     __attach_beforeScalingCurrentRoad(how_many, to_where, resizing_ratio);
     __attach_scaleCurrentRoad(resizing_ratio);
@@ -171,7 +192,8 @@ void RoadController::__attach_beforeScalingCurrentRoad
 void RoadController::__attach_scaleCurrentRoad(float resizing_ratio)
 // & spaceship과 items relocation
 {
-    // 여기서 Spaceship의 relocation이 필요하다. (attach lanes)
+    // 여기서 observers의 relocation이 필요하다. (attach lanes)
+    notifyLaneIncrement();
     
     auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::__attach_moveRoadsAfterScaling, this));
@@ -239,6 +261,8 @@ void RoadController::__detachLane(int how_many, int from_where) {
 	setChangeRunningFlag();
 
 	float resizing_ratio = (float)lane_count / (lane_count - how_many);
+    tmp_how_many = how_many;
+    tmp_where = from_where;
 
     __detach_beforeMovingRoads(how_many, from_where, resizing_ratio);
     __detach_moveRoads(resizing_ratio);
@@ -307,7 +331,8 @@ void RoadController::__detach_scaleNextRoadAfterMovingRoads(Ref* sender, void* r
     if (!hori_rails->empty())
         removeHorizontalRail();
     
-    // 여기서 Spaceship의 relocation이 필요하다. (detach lanes)
+    // 여기서 observers의 relocation이 필요하다. (detach lanes)
+    notifyLaneDecrement();
     
 	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(
@@ -334,6 +359,28 @@ void RoadController::__detach_makeNewRoadAfterScalingNextRoad()
 	road_layer->addChild(next_road);
     
 	unsetChangeRunningFlag();
+}
+
+/*
+ * Notify Road Change
+ */
+void RoadController::notifyLaneIncrement() {
+    
+    for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
+		RoadChangeObserver *observer = (RoadChangeObserver*)*it;
+		observer->onLaneIncrement(tmp_how_many, tmp_where);
+	}
+    tmp_how_many = 0;
+    tmp_where = 0;
+}
+void RoadController::notifyLaneDecrement() {
+    
+    for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
+		RoadChangeObserver *observer = (RoadChangeObserver*)*it;
+		observer->onLaneDecrement(tmp_how_many, tmp_where);
+	}
+    tmp_how_many = 0;
+    tmp_where = 0;
 }
 
 /*
@@ -504,6 +551,15 @@ RoadController::~RoadController() {
 		cur_road->removeFromParent();
 	if (road_layer != NULL)
 		road_layer->removeFromParent();
-    if (hori_rails != NULL)
-        hori_rails->~Vector();
+    if (hori_rails != NULL) {
+        if (hori_rails->size() != 0) {
+            // remove horizontal rails
+            //hori_rails->clear();
+        }
+        //hori_rails->~Vector();
+    }
+    if (observers != NULL) {
+        //observers->clear();
+        //observers->~Vector();
+    }
 }
