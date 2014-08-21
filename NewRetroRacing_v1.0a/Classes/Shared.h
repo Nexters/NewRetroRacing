@@ -23,20 +23,17 @@ class Shared {
 public:
     static Shared* getInstance();
     static void releaseInstance();
+    
     static Vec2 adjustPoint(Vec2 point);
     
-    float getCurrentSpeed();
+public:
     float getScreenSizeRatio();
-    float getCurrentElapsedTime();
-    Vec2 getValidHorizontalRangeOfCar();
-    Vec2 getValidHorizontalRangeOfObstacle();
-    float getTheNumberOfLanes();
-    
     void setScreenSizeRatio(float ratio);
-    void setValidHorizontalRangeOfCar(Vec2 range);
-    void setValidHorizontalRangeOfObstacle(Vec2 range);
-    void setTheNumberOfLanes(float _num_of_lanes);
+    
+    float getCurrentElapsedTime();
     void incrementElapsedTime(int sec);
+    
+    float getCurrentSpeed();
     
     void resetGameSceneData();
     void resetElapsedTime();
@@ -52,11 +49,6 @@ private:
     int elapsed_time;
     float screen_size_ratio;
     float current_speed;
-    
-    Vec2 car_valid_range;
-    Vec2 obs_valid_range;
-    
-    unsigned int num_of_lanes;
 };
 
-#endif /* CONSTANTS_H_ */
+#endif
