@@ -212,9 +212,9 @@ void RoadController::__attach_moveRoadsAfterScaling()
 	}   // cur_road의 높이가 커서 next_road와 겹쳐보이는 경우가 없도록
         // cur_road에서 GAME_SCENE_HEIGHT 보다 위에 있는 영역을 잘라내는 코드
     
-    // 작아진 길에서 Car가 움직일 수 있는 가로 범위 설정
-   // Shared *shared = Shared::getInstance();
-   // shared->setValidHorizontalRangeOfCar(Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
+    // 작아진 길에서 spaceship이 움직일 수 있는 가로 범위 설정
+    notifyCurrentValidHorizontalRange(spaceship_type,
+                                      Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
 
 	float moving_speed = Shared::getInstance()->getCurrentSpeed();
 	float act3_moving_distance = next_road->getPositionY();
@@ -240,10 +240,10 @@ void RoadController::__attach_makeNewRoadAfterMovingRoads()
 	cur_road = next_road;
 	resumeRailActionsOf(cur_road);
     
-    // 새로운 길에서 Car가 움직일 수 있는 가로 범위 설정
-    //Rect cur_road_rect = cur_road->getBoundingBox();
-    //Shared *shared = Shared::getInstance();
-    //shared->setValidHorizontalRangeOfCar(Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
+    // 새로운 길에서 spaceship이 움직일 수 있는 가로 범위 설정
+    Rect cur_road_rect = cur_road->getBoundingBox();
+    notifyCurrentValidHorizontalRange(spaceship_type,
+                                      Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
     
 	next_road = cocos2d::Sprite::create("road_2560.png");
 	next_road->setAnchorPoint(Point(0.5, 0.0));
@@ -348,10 +348,10 @@ void RoadController::__detach_makeNewRoadAfterScalingNextRoad()
 	cur_road = next_road;
 	resumeRailActionsOf(cur_road);
     
-    // 새로운 길에서 Car가 움직일 수 있는 가로 범위 설정
+    // 새로운 길에서 spaceship이 움직일 수 있는 가로 범위 설정
     Rect cur_road_rect = cur_road->getBoundingBox();
-    //Shared *shared = Shared::getInstance();
-    //shared->setValidHorizontalRangeOfCar(Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
+    notifyCurrentValidHorizontalRange(spaceship_type,
+                                      Vec2(cur_road_rect.getMinX(), cur_road_rect.getMaxX()));
     
 	next_road = cocos2d::Sprite::create("road_2560.png");
 	next_road->setAnchorPoint(Point(0.5, 0.0));
@@ -381,6 +381,15 @@ void RoadController::notifyLaneDecrement() {
 	}
     tmp_how_many = 0;
     tmp_where = 0;
+}
+void RoadController::notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2 range) {
+    
+    for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
+		RoadChangeObserver *observer = (RoadChangeObserver*)*it;
+		if (observer->getObserverType() == o_type) {
+            observer->onVerticalRangeChange(range);
+        }
+	}
 }
 
 /*

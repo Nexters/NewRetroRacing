@@ -48,6 +48,7 @@ private:
 private:
     void notifyLaneIncrement();
     void notifyLaneDecrement();
+    void notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2 range);
     
 private:
     void setChangeRunningFlag();
