@@ -5,11 +5,9 @@ USING_NS_CC;
 using namespace CocosDenshion;
 
 AppDelegate::AppDelegate() {
-
 }
 
-AppDelegate::~AppDelegate() 
-{
+AppDelegate::~AppDelegate() {
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {

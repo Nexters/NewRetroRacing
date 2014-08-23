@@ -14,7 +14,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/BgLayerController.cpp \
                    ../../Classes/RoadController.cpp \
                    ../../Classes/car.cpp \
-                   ../../Classes/Obstacles.cpp
+                   ../../Classes/Obstacles.cpp \
+                   ../../Classes/Spaceship.cpp
                    
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

@@ -9,6 +9,7 @@
 #include "Shared.h"
 #include "RoadController.h"
 #include "BgLayerController.h"
+#include "Spaceship.h"
 #include "car.h"
 
 class GameScene : public cocos2d::Layer
@@ -54,6 +55,7 @@ public:
 private:
     BgLayerController *bg_cont;
     RoadController* road_cont;
+    Spaceship* s;
     car* playerCar;
 
     int roadLineNumber;
