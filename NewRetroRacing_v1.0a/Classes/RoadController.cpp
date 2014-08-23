@@ -6,13 +6,8 @@
 RoadController::RoadController() {
 
 	road_layer = cocos2d::Layer::create();
-<<<<<<< HEAD
-	num_lane = 2;		// 초기 lane 갯수는 2
-=======
-
     lane_count = 2;		// 초기 lane 갯수는 2
-    
->>>>>>> origin/master
+
 	// current road sprite setting
 	cur_road = cocos2d::Sprite::create("road_2560.png");
 	cur_road->setAnchorPoint(Point(0.5, 0.0));
@@ -28,10 +23,6 @@ RoadController::RoadController() {
     
 	// calculate horizontal range & lane width
 	Rect road_rect = cur_road->getBoundingBox();
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
     
 	hori_rails = new Vector<Sprite*>();
     
