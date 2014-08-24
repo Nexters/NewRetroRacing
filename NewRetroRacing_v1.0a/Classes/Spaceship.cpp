@@ -83,6 +83,11 @@ void Spaceship::relocateShip(int lane_change, int where) {
     // |   |   |   |   | <= Lanes
     //   0   1   2   3   <= Lane number
   
+	if(cur_lane_num<0)
+		cur_lane_num=0;
+	if(cur_lane_num>4)
+		cur_lane_num=4;
+
     if (num_lane + lane_change < 2)
         return ;
     if (num_lane + lane_change > 4)
