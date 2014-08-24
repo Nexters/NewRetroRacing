@@ -6,6 +6,7 @@
 RoadController::RoadController() {
 
 	road_layer = cocos2d::Layer::create();
+
     lane_count = 2;		// 초기 lane 갯수는 2
 
 	// current road sprite setting

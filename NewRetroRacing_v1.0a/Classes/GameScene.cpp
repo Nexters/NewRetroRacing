@@ -63,6 +63,8 @@ bool GameScene::init()
     s = new Spaceship(0);
     s->attachShipTo(this, 3);
     road_cont->addRoadChangeObserver(s);
+
+	this->scheduleUpdate();
     
     CCLOG("s type: %d", s->getObserverType());
 
@@ -134,41 +136,37 @@ void GameScene::update(float dt) {
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	CCLog("min : %lf, max : %lf, moveL : %lf",playerCar->getMinX(),playerCar->getMaxX(),playerCar->moveLength);
-	CCLog("carPos : x=%lf",playerCar->getCarPosition().x);
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
 		{
-			float leftsize = playerCar->getCarPosition().x;
-			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (leftsize <= playerCar->getMinX() || running>0)
+			float leftsize = s->getSpaceShipPos().x;
+			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (leftsize <= s->getMoveRange().x || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Left ");
-				playerCar->moveLeft();
+				s->moveLeft();
 			}
 			isTouchDown=false;
-			playerCar->getSpriteCar()->setAnchorPoint(Vec2(0.5,0.5));
 		}
 		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
 		{
-			float rightsize = playerCar->getCarPosition().x;
-			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (rightsize >= playerCar->getMaxX() || running>0)
+			float rightsize = s->getSpaceShipPos().x;
+			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (rightsize >= s->getMoveRange().y || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Right ");
-				playerCar->moveRight();
+				s->moveRight();
 			}
 			isTouchDown=false;
-			playerCar->getSpriteCar()->setAnchorPoint(Vec2(0.5,0.5));
 		}
 	}
 }
