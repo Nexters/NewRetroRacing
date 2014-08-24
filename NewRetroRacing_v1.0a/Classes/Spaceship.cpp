@@ -99,7 +99,10 @@ void Spaceship::relocateShip(int lane_change, int where) {
             return ;
         
         if (where == 1 || where == 3) {     // 왼쪽에 lane이 하나 추가되는 경우 or 양쪽에 lane이 하나씩 추가되는경우
-            next_lane_num += 1;
+			if(lane_change==2 && where == 1)
+				next_lane_num += 2;
+			else
+				next_lane_num += 1;
         }
     }
     else if (lane_change == -1 || lane_change == -2) {
@@ -108,7 +111,10 @@ void Spaceship::relocateShip(int lane_change, int where) {
             return ;
         
         if (where == 1 || where == 3) {
-            next_lane_num -= 1;
+			if(lane_change==-2 && where==1)
+				next_lane_num -= 2;
+			else
+				next_lane_num -= 1;
         }
     }
     else {
