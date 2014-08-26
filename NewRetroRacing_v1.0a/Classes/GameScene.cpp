@@ -68,6 +68,10 @@ bool GameScene::init()
     
     CCLOG("s type: %d", s->getObserverType());
 
+	blendLayer = LayerColor::create( Color4B(255, 255, 255, 0) );
+	this->addChild(blendLayer,100,123);
+	this->setKeypadEnabled(true);
+
     return true;
 }
 
@@ -177,7 +181,49 @@ void GameScene::gameOver(float delta) {
 }
 
 
+void GameScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	
+	if(keyCode== EventKeyboard::KeyCode::KEY_MENU)
+	{
+		if(getOpacity()==0)
+		{
+			blendLayer->setOpacity(80);
+			feverMode();
+		}
+		else
+		{
+			blendLayer->setOpacity(0);
+			feverMode();
+		}
 
+	}
+	else if(keyCode==EventKeyboard::KeyCode::KEY_ESCAPE)
+	{
+		Director::getInstance()->end();
+	}
+}
+void GameScene::feverMode()
+{
+	auto layer = (LayerColor*)getChildByTag(123);
+
+	GLenum src;
+	GLenum dst;
+
+	if( layer->getBlendFunc().dst == GL_ZERO )
+	{
+		src = GL_SRC_ALPHA;
+		dst = GL_ONE_MINUS_SRC_ALPHA;
+	}
+	else
+	{
+		src = GL_ONE_MINUS_DST_COLOR;
+		dst = GL_ZERO;
+	}
+
+	BlendFunc bf = {src, dst};
+	layer->setBlendFunc( bf );
+}
 // for test
 
 void GameScene::attachTestButtons() {

@@ -50,6 +50,9 @@ public:
     void attachTestButtons();
     bool buttonTouched(Touch *touch);
     /* ******** */
+	void feverMode();
+	virtual void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+
     
 private:
     BgLayerController *bg_cont;
@@ -60,6 +63,7 @@ private:
     bool isTouchDown;
     float initTouchPos[2];
 	float currTouchPos[2];
+	LayerColor* blendLayer;
 };
 
 #endif // __GAME_SCENE_H__
