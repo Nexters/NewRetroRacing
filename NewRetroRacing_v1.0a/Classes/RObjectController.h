@@ -32,6 +32,8 @@ private:
     
     void relocateRObects(int lane_change, int where, bool* _flag);
     
+    int generateRandomNumber(unsigned int max);
+    
 private:
     ~RObjectController();
     

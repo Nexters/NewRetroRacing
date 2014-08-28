@@ -109,7 +109,6 @@ void GameScene::initGameSceneData() {
 
 void GameScene::updateElpasedTime(float delta) {
     
-    CCLOG("aa %f %f", Shared::getInstance()->getCurrentElapsedTime(), Shared::getInstance()->getCurrentSpeed());
     Shared::getInstance()->incrementElapsedTime((int)delta);
 }
 
@@ -147,7 +146,9 @@ void GameScene::update(float dt) {
     
     if (speed_label != NULL) {
         std::string *speed_str = new std::string("Speed: ");
-        speed_str->append(std::to_string(Shared::getInstance()->getCurrentSpeed()));
+        char speed[10];
+        sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
+        speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
         free(speed_str);
     }

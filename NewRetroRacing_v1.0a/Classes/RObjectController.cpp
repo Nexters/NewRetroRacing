@@ -1,9 +1,13 @@
 #include "RObjectController.h"
 #include "Shared.h"
 
+#include <random>
+#include <ctime>
+#include <functional>
+
 #define SCHE_KEY "generate"
 #define INIT_V_RANGE Vec2(100.0, 620.0)
-#define INIT_Y_POS 1400
+#define INIT_Y_POS 1500
 
 RObjectController::RObjectController(int _lane_cnt)
 :lane_cnt(_lane_cnt) {
@@ -54,6 +58,8 @@ void RObjectController::onLaneChange(int current, int next, int to_where) {
     is_relocating = true;
     if (!robj_set_list->empty())
         relocateRObects(next - current, to_where, &is_relocating);
+    else
+        is_relocating = false;
     lane_cnt = next;
 }
 void RObjectController::onVerticalRangeChange(Vec2 range) {
@@ -62,6 +68,8 @@ void RObjectController::onVerticalRangeChange(Vec2 range) {
 }
 
 void RObjectController::generateRObjects(float dt) {
+    
+    CCLOG("GEN");
     
     if (parent_layer == NULL)
         return;
@@ -74,8 +82,8 @@ void RObjectController::generateRObjects(float dt) {
     bool all_true = true;
     
     for (int i = 0; i < lane_cnt; i++) {
-        srand(time(NULL) * time(NULL) + i);
-        int yn = rand() % 2;
+        int yn = generateRandomNumber(2-1);
+        CCLOG("ran %d", yn);
         if (yn == 0) {
             box[i] = true;
         }
@@ -85,8 +93,7 @@ void RObjectController::generateRObjects(float dt) {
     }
     
     if (all_true) {
-        srand(time(NULL) * time(NULL));
-        int rn = rand() % lane_cnt;
+        int rn = generateRandomNumber(lane_cnt-1);
         box[rn] = false;
     }
     for (int i = 0; i < lane_cnt; i++) {
@@ -189,6 +196,15 @@ void RObjectController::relocateRObects(int lane_change, int where, bool* _flag)
             set->relocateRObjectSet(Point(new_x_pos, new_y_pos), ratio, NULL);
         set->setLaneNumber(cur_lane_num);
 	}
+}
+
+int RObjectController::generateRandomNumber(unsigned int max) {
+    
+    mt19937 engine((unsigned int)time(NULL));                    // MT19937 난수 엔진
+    uniform_int_distribution<int> distribution(0, max);       // 생성 범위
+    auto generator = bind(distribution, engine);
+    
+    return generator();
 }
 
 RObjectController::~RObjectController() {

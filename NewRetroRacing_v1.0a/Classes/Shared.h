@@ -15,7 +15,7 @@
 #define BASIC_SPEED 300.0
 #define SPEED_LIMIT 2000.0
 
-#define RELOCATION_TIME 5.0
+#define RELOCATION_TIME 0.2
 
 #define BG_MOVING_SPEED 100.0
 
