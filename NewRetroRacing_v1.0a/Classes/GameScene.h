@@ -6,7 +6,7 @@
 #include "RoadController.h"
 #include "BgLayerController.h"
 #include "Spaceship.h"
-#include "car.h"
+#include "RObjectController.h"
 
 class GameScene : public cocos2d::Layer
 {
@@ -46,8 +46,9 @@ private:
     BgLayerController *bg_cont;
     RoadController* road_cont;
     Spaceship* s;
-    car* playerCar;
-
+    RObjectController* robj_cont;
+    
+    Label* speed_label;
     
     bool isTouchDown;
     float initTouchPos[2];

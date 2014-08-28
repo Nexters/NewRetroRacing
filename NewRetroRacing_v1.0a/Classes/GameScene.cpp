@@ -14,6 +14,7 @@
 #define RIGHT_BTN_TAG3	22
 #define RIGHT_BTN_TAG4	23
 #define RIGHT_BTN_TAG5	24
+#define RIGHT_BTN_TAG6	25
 /* ******** */
 
 #define SENS 0.01
@@ -54,16 +55,9 @@ bool GameScene::init()
     road_cont->attachRoadLayerTo(this, 1);
 
 // update elpased time
-    this->schedule(schedule_selector(GameScene::updateElpasedTime), 5.0);
+    this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
+    this->scheduleUpdate();
 
-/*
-// about Car
-    playerCar = new car("default","rocket.png");
-	playerCar->addOnRoad(this);
-	playerCar->setMoveLength(230);
-	this->scheduleUpdate();
-*/
-    
 // test buttons
     attachTestButtons();
     
@@ -72,12 +66,23 @@ bool GameScene::init()
     s->attachShipTo(this, 3);
     road_cont->addRoadChangeObserver(s);
     
-    CCLOG("s type: %d", s->getObserverType());
+    robj_cont = new RObjectController(2);
+    robj_cont->attachRObjectsTo(this, 4);
+    road_cont->addRoadChangeObserver(robj_cont);
+    
+    speed_label = Label::create();
+    speed_label->setString("Speed: 0.0");
+    speed_label->setSystemFontSize(30);
+    speed_label->setAnchorPoint(Point(0.0, 0.5));
+    speed_label->setPosition(Point(450.0, 1000.0));
+    this->addChild(speed_label, 10);
 
     return true;
 }
 
 void GameScene::initGameSceneData() {
+    
+    speed_label = NULL;
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Shared* shared = Shared::getInstance();
@@ -104,6 +109,7 @@ void GameScene::initGameSceneData() {
 
 void GameScene::updateElpasedTime(float delta) {
     
+    CCLOG("aa %f %f", Shared::getInstance()->getCurrentElapsedTime(), Shared::getInstance()->getCurrentSpeed());
     Shared::getInstance()->incrementElapsedTime((int)delta);
 }
 
@@ -139,9 +145,16 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 
 void GameScene::update(float dt) {
     
+    if (speed_label != NULL) {
+        std::string *speed_str = new std::string("Speed: ");
+        speed_str->append(std::to_string(Shared::getInstance()->getCurrentSpeed()));
+        speed_label->setString(speed_str->c_str());
+        free(speed_str);
+    }
+    
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
+    /*
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
@@ -175,6 +188,7 @@ void GameScene::update(float dt) {
 			isTouchDown=false;
 		}
 	}
+     */
 }
 
 void GameScene::gameOver(float delta) {
@@ -265,12 +279,20 @@ void GameScene::attachTestButtons() {
 	left_btn6->setScale(2.0);
 	left_btn6->setTag(LEFT_BTN_TAG6);
 	this->addChild(left_btn6,3);
+    
+    auto right_btn6 = Sprite::create("CloseSelected.png");
+	right_btn6->setAnchorPoint(Point(0.5, 0.5));
+	right_btn6->setPosition(Point(720 - 40, 900));
+	right_btn6->setScale(2.0);
+	right_btn6->setTag(RIGHT_BTN_TAG6);
+	this->addChild(right_btn6,3);
 }
 
 bool GameScene::buttonTouched(Touch *touch) {
     
-    if (road_cont == NULL)
+    if (road_cont == NULL) {
         return false;
+    }
     
     Point touch_location = Shared::getInstance()->adjustPoint(touch->getLocation());
     
@@ -308,6 +330,9 @@ bool GameScene::buttonTouched(Touch *touch) {
     
 	Sprite *right_btn5 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG5);
 	Rect right_btn5_rect = right_btn5->getBoundingBox();
+    
+    Sprite *right_btn6 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG6);
+	Rect right_btn6_rect = right_btn6->getBoundingBox();
     
     
 	if (left_btn1_rect.containsPoint(touch_location)) {
@@ -363,6 +388,11 @@ bool GameScene::buttonTouched(Touch *touch) {
 	else if (left_btn6_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN6 TOUCHED!!");
         Shared::getInstance()->resetElapsedTime();
+		return true;
+	}
+    else if (right_btn6_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN6 TOUCHED!!");
+        robj_cont->startGeneratingRObjects();
 		return true;
 	}
 	else {

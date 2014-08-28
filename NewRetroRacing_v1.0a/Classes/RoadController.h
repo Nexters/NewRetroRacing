@@ -46,8 +46,7 @@ private:
 	void removeHorizontalRail();
     
 private:
-    void notifyLaneIncrement();
-    void notifyLaneDecrement();
+    void notifyLaneChange();
     void notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2 range);
     
 private:
@@ -65,11 +64,11 @@ private:
 	Vector<Sprite*> *hori_rails;
     vector<RoadChangeObserver*> *observers;
     
-	int lane_count;
+	int lane_cnt;
 	bool change_running;
     
 private:
-    int tmp_how_many;
+    int prev_lane_cnt;
     int tmp_where;
 };
 

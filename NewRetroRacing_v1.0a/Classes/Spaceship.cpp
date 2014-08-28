@@ -42,13 +42,9 @@ void Spaceship::attachShipTo(Layer* layer, int zOrder) {
     layer->addChild(ship, zOrder);
 }
 
-void Spaceship::onLaneIncrement(int how_many, int to_where) {
+void Spaceship::onLaneChange(int current, int next, int to_where) {
     
-    relocateShip(how_many, to_where);
-}
-void Spaceship::onLaneDecrement(int how_many, int from_where) {
-    
-    relocateShip(-how_many, from_where);
+    relocateShip(next - current, to_where);
 }
 
 void Spaceship::onVerticalRangeChange(Vec2 range) {
@@ -76,7 +72,10 @@ void Spaceship::relocateShip(int lane_change, int where) {
             return ;
         
         if (where == 1 || where == 3) {     // 왼쪽에 lane이 하나 추가되는 경우 or 양쪽에 lane이 하나씩 추가되는경우
-            next_lane_num += 1;
+            if (where == 1 && lane_change == 2)
+                next_lane_num += 2;
+            else
+                next_lane_num += 1;
         }
     }
     else if (lane_change == -1 || lane_change == -2) {
@@ -85,7 +84,10 @@ void Spaceship::relocateShip(int lane_change, int where) {
             return ;
         
         if (where == 1 || where == 3) {
-            next_lane_num -= 1;
+            if (where == 1 && lane_change == 2)
+                next_lane_num -= 2;
+            else
+                next_lane_num -= 1;
         }
     }
     else {

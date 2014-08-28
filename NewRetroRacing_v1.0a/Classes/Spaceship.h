@@ -4,9 +4,6 @@
 #include "cocos2d.h"
 #include "RoadChangeObserver.h"
 
-#define LEFT_MARGIN 100.0
-#define RAIL_WIDTH 30.0
-
 #define INITIAL_X (LEFT_MARGIN + RAIL_WIDTH + 115.0)
 #define INITIAL_Y 100.0
 
@@ -20,9 +17,7 @@ public:
     
     void attachShipTo(Layer* layer, int zOrder);
     
-    virtual void onLaneIncrement(int how_many, int to_where);
-    virtual void onLaneDecrement(int how_many, int from_where);
-    
+    virtual void onLaneChange(int current, int next, int to_where);
     virtual void onVerticalRangeChange(Vec2 range);
     
 private:

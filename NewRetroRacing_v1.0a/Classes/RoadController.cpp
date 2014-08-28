@@ -7,14 +7,14 @@ RoadController::RoadController() {
 
 	road_layer = cocos2d::Layer::create();
 
-    lane_count = 2;		// 초기 lane 갯수는 2
+    lane_cnt = 2;		// 초기 lane 갯수는 2
     
 	// current road sprite setting
 	cur_road = cocos2d::Sprite::create("road_2560.png");
 	cur_road->setAnchorPoint(Point(0.5, 0.0));
 	cur_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, 0.0));
 	road_layer->addChild(cur_road);
-	addRailTo(cur_road, lane_count);	// add rail sprites to current road sprite
+	addRailTo(cur_road, lane_cnt);	// add rail sprites to current road sprite
 
 	// next road sprite setting
 	next_road = cocos2d::Sprite::create("road_2560.png");
@@ -28,7 +28,7 @@ RoadController::RoadController() {
 	hori_rails = new Vector<Sprite*>();
     
     observers = new vector<RoadChangeObserver*>();
-    tmp_how_many = 0;
+    prev_lane_cnt = lane_cnt;
     tmp_where = 0;
     
 	unsetChangeRunningFlag();
@@ -50,9 +50,9 @@ bool RoadController::attachLane(int how_many, int to_where) {
 	if (getChangeRunningFlag())
 		return false;
 
-	if (lane_count + how_many > 4) {	// The number of lanes should be smaller than 5.
+	if (lane_cnt + how_many > 4) {	// The number of lanes should be smaller than 5.
 		CCLOG("RoadController::attachLane(int how_many, int to_where) Exception: how_many(%d) err, current number of lanes(%d)",
-				how_many, lane_count);
+				how_many, lane_cnt);
 		return false;
 	}
 
@@ -91,9 +91,9 @@ bool RoadController::detachLane(int how_many, int from_where) {
 	if (getChangeRunningFlag())
 		return false;
 
-	if (lane_count - how_many < 2) {	// The number of lanes should be smaller than 5.
+	if (lane_cnt - how_many < 2) {	// The number of lanes should be smaller than 5.
 		CCLOG("RoadController::detachLane(int how_many, int to_where) Exception: how_many(%d) err, current number of lanes(%d)",
-				how_many, lane_count);
+				how_many, lane_cnt);
 		return false;
 	}
 
@@ -151,21 +151,20 @@ void RoadController::__attachLane(int how_many, int to_where) {
 	setChangeRunningFlag();
     // attachLane 혹은 detachLane 함수가 한번 호출되면, 그 호출이 종료되기 전까지
     // change_running 이라는 flag를 true로 설정해서 중복적으로 호출되지 않도록 한다.
-    
-	float resizing_ratio = (float)lane_count / (lane_count + how_many);
-    tmp_how_many = how_many;
+
+    prev_lane_cnt = lane_cnt;
+    lane_cnt += how_many;
     tmp_where = to_where;
-	
+    
+	float resizing_ratio = (float)prev_lane_cnt / lane_cnt;
+
     __attach_beforeScalingCurrentRoad(how_many, to_where, resizing_ratio);
     __attach_scaleCurrentRoad(resizing_ratio);
-    
-	lane_count += how_many;
 }
 void RoadController::__attach_beforeScalingCurrentRoad
     (int how_many, int to_where, float resizing_ratio)
 {
-    
-    addRailTo(next_road, lane_count + how_many);
+    addRailTo(next_road, lane_cnt);
 	
     pauseRailActionsOfNextRoad(next_road);
 	pauseRailActionsOfCurrentRoad(cur_road, resizing_ratio);
@@ -174,26 +173,26 @@ void RoadController::__attach_beforeScalingCurrentRoad
 		cur_road->setAnchorPoint(Point(1.0, 0.0));
 		cur_road->setPosition(Point(next_road->getBoundingBox().getMaxX(), 0.0));
 		for (int i = 0; i < how_many; i++)
-			addHorizontalRailTo(next_road, lane_count + how_many, i+1);
+			addHorizontalRailTo(next_road, lane_cnt, i+1);
 	}
 	else if (to_where == 2) {
 		cur_road->setAnchorPoint(Point(0.0, 0.0));
 		cur_road->setPosition(Point(next_road->getBoundingBox().getMinX(), 0.0));
 		for (int i = 0; i < how_many; i++)
-			addHorizontalRailTo(next_road, lane_count + how_many, lane_count + how_many - i);
+			addHorizontalRailTo(next_road, lane_cnt, lane_cnt - i);
 	}
 	else if (to_where == 3) {
 		cur_road->setAnchorPoint(Point(0.5, 0.0));
 		cur_road->setPosition(Point(GAME_SCENE_WIDTH / 2.0, 0.0));
-		addHorizontalRailTo(next_road, lane_count + how_many, 1);
-		addHorizontalRailTo(next_road, lane_count + how_many, lane_count + how_many);
+		addHorizontalRailTo(next_road, lane_cnt, 1);
+		addHorizontalRailTo(next_road, lane_cnt, lane_cnt);
 	}
 }
 void RoadController::__attach_scaleCurrentRoad(float resizing_ratio)
 // & spaceship과 items relocation
 {
     // 여기서 observers의 relocation이 필요하다. (attach lanes)
-    notifyLaneIncrement();
+    notifyLaneChange();
     
     auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(CC_CALLBACK_0(RoadController::__attach_moveRoadsAfterScaling, this));
@@ -259,20 +258,20 @@ void RoadController::__attach_makeNewRoadAfterMovingRoads()
 void RoadController::__detachLane(int how_many, int from_where) {
 
 	setChangeRunningFlag();
-
-	float resizing_ratio = (float)lane_count / (lane_count - how_many);
-    tmp_how_many = how_many;
+    
+    prev_lane_cnt = lane_cnt;
+    lane_cnt -= how_many;
     tmp_where = from_where;
 
+	float resizing_ratio = (float)prev_lane_cnt / lane_cnt;
+    
     __detach_beforeMovingRoads(how_many, from_where, resizing_ratio);
     __detach_moveRoads(resizing_ratio);
-
-	lane_count -= how_many;
 }
 void RoadController::__detach_beforeMovingRoads(int how_many, int from_where, float resizing_ratio)
 {
     
-    addRailTo(next_road, lane_count - how_many);
+    addRailTo(next_road, lane_cnt);
 	pauseRailActionsOfNextRoad(next_road);
 	pauseRailActionsOfCurrentRoad(cur_road, resizing_ratio);
     
@@ -281,22 +280,22 @@ void RoadController::__detach_beforeMovingRoads(int how_many, int from_where, fl
 		next_road->setPosition(
                                Point(cur_road->getBoundingBox().getMaxX(), next_road->getPositionY()));
 		for (int i = 0; i < how_many; i++)
-			addHorizontalRailTo(cur_road, lane_count, i+1);
+			addHorizontalRailTo(cur_road, prev_lane_cnt, i+1);
 	}
 	else if (from_where == 2) {
 		next_road->setAnchorPoint(Point(0.0, 0.0));
 		next_road->setPosition(
                                Point(cur_road->getBoundingBox().getMinX(), next_road->getPositionY()));
 		for (int i = 0; i < how_many; i++)
-			addHorizontalRailTo(cur_road, lane_count, lane_count-i);
+			addHorizontalRailTo(cur_road, prev_lane_cnt, prev_lane_cnt-i);
 	}
 	else if (from_where == 3) {
 		next_road->setAnchorPoint(Point(0.5, 0.0));
 		next_road->setPosition(
                                Point((cur_road->getBoundingBox().getMinX() + cur_road->getBoundingBox().getMaxX()) / 2.0,
                                      next_road->getPositionY()));
-		addHorizontalRailTo(cur_road, lane_count, 1);
-		addHorizontalRailTo(cur_road, lane_count, lane_count);
+		addHorizontalRailTo(cur_road, prev_lane_cnt, 1);
+		addHorizontalRailTo(cur_road, prev_lane_cnt, prev_lane_cnt);
 	}
 	next_road->setScale(1 / resizing_ratio);
     
@@ -307,6 +306,9 @@ void RoadController::__detach_beforeMovingRoads(int how_many, int from_where, fl
 }
 void RoadController::__detach_moveRoads(float resizing_ratio)
 {
+    Rect next_road_rect = next_road->getBoundingBox();
+    notifyCurrentValidHorizontalRange(robj_type,
+                                      Vec2(next_road_rect.getMinX(), next_road_rect.getMaxX()));
     
     float moving_speed = Shared::getInstance()->getCurrentSpeed();
 	float act2_moving_distance = next_road->getPositionY();
@@ -332,7 +334,7 @@ void RoadController::__detach_scaleNextRoadAfterMovingRoads(Ref* sender, void* r
         removeHorizontalRail();
     
     // 여기서 observers의 relocation이 필요하다. (detach lanes)
-    notifyLaneDecrement();
+    notifyLaneChange();
     
 	auto act1 = ScaleBy::create(RELOCATION_TIME, resizing_ratio);
 	auto act1_2 = CallFuncN::create(
@@ -364,22 +366,13 @@ void RoadController::__detach_makeNewRoadAfterScalingNextRoad()
 /*
  * Notify Road Change
  */
-void RoadController::notifyLaneIncrement() {
+void RoadController::notifyLaneChange() {
     
     for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
 		RoadChangeObserver *observer = (RoadChangeObserver*)*it;
-		observer->onLaneIncrement(tmp_how_many, tmp_where);
+		observer->onLaneChange(prev_lane_cnt, lane_cnt, tmp_where);
 	}
-    tmp_how_many = 0;
-    tmp_where = 0;
-}
-void RoadController::notifyLaneDecrement() {
-    
-    for (std::vector<RoadChangeObserver*>::iterator it = observers->begin(); it != observers->end(); ++it) {
-		RoadChangeObserver *observer = (RoadChangeObserver*)*it;
-		observer->onLaneDecrement(tmp_how_many, tmp_where);
-	}
-    tmp_how_many = 0;
+    prev_lane_cnt = lane_cnt;
     tmp_where = 0;
 }
 void RoadController::notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2 range) {
@@ -395,12 +388,12 @@ void RoadController::notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2
 /*
  * road에 rail 붙이고 rail에 action 적용하는 함수
  */
-void RoadController::addRailTo(Sprite* road, int _lane_count) {
+void RoadController::addRailTo(Sprite* road, int _lane_cnt) {
 
     std::string *img_file_name = new std::string("");
 	float size_ratio = 1.0;
 
-	switch (_lane_count) {
+	switch (_lane_cnt) {
 	case 2:
 		img_file_name->append("rail_2.png");
 		break;
@@ -413,7 +406,7 @@ void RoadController::addRailTo(Sprite* road, int _lane_count) {
 		size_ratio *= 2.0/4;
 		break;
 	default:
-		CCLOG("Variable _lane_count is invalid.");
+		CCLOG("Variable _lane_cnt is invalid.");
 		return;
 	}
 
@@ -509,9 +502,9 @@ void RoadController::resumeRailActionsOf(Sprite* road) {
 /*
  * functions about horizontal rail
  */
-void RoadController::addHorizontalRailTo(Sprite* road, int _lane_count, int lane_num) {
+void RoadController::addHorizontalRailTo(Sprite* road, int _lane_cnt, int lane_num) {
 
-	float ratio = 2.0 / _lane_count;
+	float ratio = 2.0 / _lane_cnt;
 	auto hori_rail = Sprite::create("horizontal_rail.png");
 	hori_rail->setAnchorPoint(Point(0.5, 0.0));
 

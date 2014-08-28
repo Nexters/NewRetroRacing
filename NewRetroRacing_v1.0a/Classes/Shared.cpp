@@ -25,6 +25,13 @@ Vec2 Shared::adjustPoint(Vec2 point) {
     
     return point / shared_instance->screen_size_ratio;
 }
+float Shared::getXPositionOfObject(int lane_cnt, int lane_num, float ratio) {
+    float distance = (ROAD_WIDTH - (RAIL_WIDTH * ratio * 2)) / lane_cnt;
+    float x_pos = LEFT_MARGIN + (RAIL_WIDTH * ratio) + (distance / 2);
+    for (int i = 0; i < lane_num; i++)
+        x_pos += distance;
+    return x_pos;
+}
 
 float Shared::getScreenSizeRatio() {
     
@@ -42,8 +49,9 @@ float Shared::getCurrentElapsedTime() {
 void Shared::incrementElapsedTime(int sec) {
     
     elapsed_time += sec;
-    if (current_speed < SPEED_LIMIT)
-        current_speed = BASIC_SPEED + powf(((float)elapsed_time * (SPEED_CONSTANT * 0.01)), 3);
+    float variation = powf(((float)elapsed_time * (SPEED_CONSTANT * 0.01)), 3);
+    if (current_speed + variation < SPEED_LIMIT)
+        current_speed = BASIC_SPEED + variation;
 }
 
 float Shared::getCurrentSpeed() {
