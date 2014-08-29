@@ -76,13 +76,13 @@ bool GameScene::init()
     this->addChild(speed_label, 10);
 
 	Sprite* feverSprite = Sprite::create("fever.png");
-	feverSprite->setPosition(Vec2(74.5,1258));
+	feverSprite->setPosition(Vec2(74.5,1258-200));
 	this->addChild(feverSprite,10);
 
 	sBar = Sprite::create("gauge.png");
 	ptBar = ProgressTimer::create(sBar);
 	ptBar->setType(kCCProgressTimerTypeBar);
-	ptBar->setPosition(Vec2(217.5,1270.25));
+	ptBar->setPosition(Vec2(217.5,1270.25-200));
 	ptBar->setMidpoint(Vec2(0,1));
 	ptBar->setBarChangeRate(Vec2(1,0));
 	this->addChild(ptBar,10);
@@ -129,7 +129,7 @@ void GameScene::gameOver() {
 void GameScene::updateElpasedTime(float delta) {
     
     Shared::getInstance()->incrementElapsedTime((int)delta);
-    //detector->handleConflict();
+
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
@@ -164,6 +164,7 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 
 void GameScene::update(float dt) {
     
+    char speed[10] = {'\0', };
     if (speed_label != NULL) {
         std::string *speed_str = new std::string("Speed: ");
         sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
