@@ -57,6 +57,7 @@ private:
     ConflictDetector *detector;
     
     Label* speed_label;
+	char speed[10];
 
     //int roadLineNumber;
     bool isTouchDown;

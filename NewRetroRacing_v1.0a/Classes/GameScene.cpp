@@ -82,8 +82,7 @@ bool GameScene::init()
 	sBar = Sprite::create("gauge.png");
 	ptBar = ProgressTimer::create(sBar);
 	ptBar->setType(kCCProgressTimerTypeBar);
-	ptBar->setAnchorPoint(Vec2(0,0));
-	ptBar->setPosition(Vec2(150,1241));
+	ptBar->setPosition(Vec2(217.5,1270.25));
 	ptBar->setMidpoint(Vec2(0,1));
 	ptBar->setBarChangeRate(Vec2(1,0));
 	this->addChild(ptBar,10);
@@ -164,9 +163,9 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 }
 
 void GameScene::update(float dt) {
+    
     if (speed_label != NULL) {
         std::string *speed_str = new std::string("Speed: ");
-		char speed[10];
         sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
         speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
