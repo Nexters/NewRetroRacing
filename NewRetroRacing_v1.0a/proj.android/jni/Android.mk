@@ -16,7 +16,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/Spaceship.cpp \
                    ../../Classes/RoadChangeObserver.cpp \
                    ../../Classes/RObjectController.cpp \
-                   ../../Classes/RObjectSet.cpp
+                   ../../Classes/RObjectSet.cpp \
+                   ../../Classes/ConflictDetector.cpp 
                    
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

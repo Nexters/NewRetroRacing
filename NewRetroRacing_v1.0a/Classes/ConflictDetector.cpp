@@ -14,14 +14,10 @@ ConflictDetector* ConflictDetector::create
 
 bool ConflictDetector::handleConflict() {
     
-    //CCLOG("a flag %d", handle_flag);
-    
     if (handle_flag)
         return false;
     
-    //CCLOG("b flag %d", handle_flag);
-    
-    handle_flag = true;
+    //handle_flag = true;
     
     Rect ship_rect = _ship->getRect();
     
@@ -31,10 +27,12 @@ bool ConflictDetector::handleConflict() {
 		Sprite *hori_rail = (Sprite*)*it;
 		if (ship_rect.intersectsRect(hori_rail->getBoundingBox())) {
             hori_rail->getBoundingBox();
-            //_handleHorizontalRail(hori_rail);
+            _handleHorizontalRail(hori_rail);
             return true;
         }
 	}
+    
+    CCLOG("size %f", ship_rect.size.width);
     
     // robject controller check
     vector<RObjectSet*> *robj_set_list = _robj_cont->getRObjectSetList();
@@ -42,22 +40,20 @@ bool ConflictDetector::handleConflict() {
         RObjectSet* robj_set = (RObjectSet*)*it;
         float ratio = 2.0 / _road_cont->getCurrentLaneCount();
         vector<RObject*>* robj_list = robj_set->getRObjectList();
-        Point basic_p = robj_set->getPosition();
+        Point basic_p = Point(robj_set->getPosition().x-(100*ratio), robj_set->getPosition().y-(100*ratio));
+        
         for (vector<RObject*>::iterator in_it = robj_list->begin(); in_it != robj_list->end(); ++in_it) {
             RObject* robj = (RObject*)*in_it;
             Rect tmp_rect = robj->getBoundingBox();
-            float diff_x = (tmp_rect.size.width - tmp_rect.size.width * ratio) / 2;
-            float diff_y = (tmp_rect.size.height - tmp_rect.size.height * ratio) / 2;
-            Size robj_size = tmp_rect.size * ratio;
-            tmp_rect.setRect(tmp_rect.getMinX() + diff_x, tmp_rect.getMinY() + diff_y,
-                             robj_size.width, robj_size.height);
-            Rect robj_rect = Rect(basic_p.x + tmp_rect.getMinX(),
-                                  basic_p.y + tmp_rect.getMinY(),
-                                  basic_p.x + tmp_rect.getMaxX(),
-                                  basic_p.y + tmp_rect.getMaxY());
+            
+            Rect robj_rect =
+                Rect(basic_p.x + 20 + tmp_rect.origin.x*ratio + ((tmp_rect.size.width/2) * (1-ratio)),
+                    basic_p.y + tmp_rect.origin.y*ratio + ((tmp_rect.size.height/2) * (1-ratio)),
+                    tmp_rect.size.width * ratio - 20,
+                    tmp_rect.size.height * ratio);
             if (ship_rect.intersectsRect(robj_rect)) {
                 _handleRObject(robj_set, robj);
-                handle_flag = false;
+                
                 return true;
             }
         } // 무한 루프??????????????
@@ -70,7 +66,8 @@ bool ConflictDetector::handleConflict() {
 
 void ConflictDetector::_handleHorizontalRail(Sprite* hori_rail) {
     
-    //CCLOG("hori rail conflict");
+    CCLOG("hori rail conflict");
+    handle_flag = false;
 }
 void ConflictDetector::_handleRObject(RObjectSet* set, RObject* robj) {
    
@@ -79,8 +76,10 @@ void ConflictDetector::_handleRObject(RObjectSet* set, RObject* robj) {
     }
     else if (robj->getRObjectType() == robj_coin) {
         CCLOG("coin conflict");
+        
     }
     set->removeRObject(robj);
+    handle_flag = false;
 }
 
 ConflictDetector::ConflictDetector

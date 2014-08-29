@@ -1,6 +1,10 @@
 #ifndef __GAME_SCENE_H__
 #define __GAME_SCENE_H__
 
+#define TAG_SPRITE_COIN 1002
+#define TAG_LABEL_COIN   3
+
+
 #include "cocos2d.h"
 #include "Shared.h"
 #include "RoadController.h"
@@ -53,7 +57,8 @@ private:
     ConflictDetector *detector;
     
     Label* speed_label;
-    
+
+    //int roadLineNumber;
     bool isTouchDown;
     float initTouchPos[2];
 	float currTouchPos[2];

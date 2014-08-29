@@ -54,10 +54,6 @@ bool GameScene::init()
     road_cont = new RoadController();
     road_cont->attachRoadLayerTo(this, 1);
 
-// update elpased time
-    this->schedule(schedule_selector(GameScene::updateElpasedTime), 3.0);
-    this->scheduleUpdate();
-
 // test buttons
     attachTestButtons();
     
@@ -78,6 +74,10 @@ bool GameScene::init()
     speed_label->setAnchorPoint(Point(0.0, 0.5));
     speed_label->setPosition(Point(450.0, 1000.0));
     this->addChild(speed_label, 10);
+    
+    // update elpased time
+    this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
+    this->scheduleUpdate();
 
     return true;
 }
@@ -97,6 +97,7 @@ void GameScene::initGameSceneData() {
     isTouchDown=false;
 	initTouchPos[0]=0;
 	initTouchPos[1]=0;
+	//roadLineNumber=2;
     
     auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -163,41 +164,41 @@ void GameScene::update(float dt) {
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    /*
+
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
 		{
-			float leftsize = playerCar->getCarPosition().x;
-			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (leftsize <= 260 || running>0)
+			float leftsize = s->getSpaceShipPos().x;
+			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (leftsize <= s->getMoveRange().x || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Left ");
-				playerCar->moveLeft();
+				s->moveLeft();
 			}
 			isTouchDown=false;
 		}
 		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
 		{
-			float rightsize = playerCar->getCarPosition().x;
-			int running = playerCar->getSpriteCar()->getNumberOfRunningActions();
-			if (rightsize >= 430 || running>0)
+			float rightsize = s->getSpaceShipPos().x;
+			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (rightsize >= s->getMoveRange().y || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Right ");
-				playerCar->moveRight();
+				s->moveRight();
 			}
 			isTouchDown=false;
 		}
 	}
-     */
+     
 }
 
 void GameScene::gameOver(float delta) {
@@ -347,51 +348,61 @@ bool GameScene::buttonTouched(Touch *touch) {
 	if (left_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN1 TOUCHED!!");
 		road_cont->attachLane(1, 1);    // 왼쪽에 한줄 추가
+		
 		return true;
 	}
 	else if (left_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN2 TOUCHED!!");
 		road_cont->attachLane(1, 2);    // 오른쪽에 한줄 추가
+		
 		return true;
 	}
 	else if (left_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN3 TOUCHED!!");
 		road_cont->attachLane(2, 1);    // 왼쪽에 두줄 추가
+		
 		return true;
 	}
 	else if (left_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN4 TOUCHED!!");
 		road_cont->attachLane(2, 2);    // 오른쪽에 두줄 추가
+		
 		return true;
 	}
 	else if (left_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("LEFT BTN5 TOUCHED!!");
 		road_cont->attachLane(2, 3);    // 양쪽에 한줄씩 추가
+		
 		return true;
 	}
 	else if (right_btn1_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN1 TOUCHED!!");
 		road_cont->detachLane(1, 1);    // 왼쪽에 한줄 삭제
+		
 		return true;
 	}
 	else if (right_btn2_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN2 TOUCHED!!");
 		road_cont->detachLane(1, 2);    // 오른쪽에 한줄 삭제
+		
 		return true;
 	}
 	else if (right_btn3_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN3 TOUCHED!!");
 		road_cont->detachLane(2, 1);    // 왼쪽에 두줄 삭제
+		
 		return true;
 	}
 	else if (right_btn4_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN4 TOUCHED!!");
 		road_cont->detachLane(2, 2);    // 오른쪽에 두줄 삭제
+		
 		return true;
 	}
 	else if (right_btn5_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN5 TOUCHED!!");
 		road_cont->detachLane(2, 3);    // 양쪽에 한줄씩 삭제
+		
 		return true;
 	}
 	else if (left_btn6_rect.containsPoint(touch_location)) {

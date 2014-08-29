@@ -8,7 +8,7 @@ RoadController::RoadController() {
 	road_layer = cocos2d::Layer::create();
 
     lane_cnt = 2;		// 초기 lane 갯수는 2
-    
+
 	// current road sprite setting
 	cur_road = cocos2d::Sprite::create("road_2560.png");
 	cur_road->setAnchorPoint(Point(0.5, 0.0));
