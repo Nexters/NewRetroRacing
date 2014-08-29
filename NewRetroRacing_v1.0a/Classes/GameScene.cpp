@@ -117,6 +117,7 @@ void GameScene::gameOver() {
 void GameScene::updateElpasedTime(float delta) {
     
     Shared::getInstance()->incrementElapsedTime((int)delta);
+    //detector->handleConflict();
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {

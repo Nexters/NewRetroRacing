@@ -212,11 +212,11 @@ void RObjectSet::_generate_setType1() {
             coin->setPosition(obs->getPositionX(),
                              obs->getPositionY()
                              - obs->getBoundingBox().size.height/2
-                             - coin->getBoundingBox().size.height/2 - 30);
+                             - coin->getBoundingBox().size.height/2 - 50);
         }
         else {
             coin->setPosition(obs->getPositionX(),
-                              prev_robj->getPositionY() - coin->getBoundingBox().size.height - 30);
+                              prev_robj->getPositionY() - coin->getBoundingBox().size.height - 50);
         }
         robj_bg->addChild(coin);
         robj_list->push_back(coin);

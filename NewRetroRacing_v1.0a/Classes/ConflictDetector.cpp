@@ -32,7 +32,7 @@ bool ConflictDetector::handleConflict() {
         }
 	}
     
-    CCLOG("size %f", ship_rect.size.width);
+    //CCLOG("ship %f %f", ship_rect.getMinX(), ship_rect.getMaxX());
     
     // robject controller check
     vector<RObjectSet*> *robj_set_list = _robj_cont->getRObjectSetList();
@@ -40,17 +40,20 @@ bool ConflictDetector::handleConflict() {
         RObjectSet* robj_set = (RObjectSet*)*it;
         float ratio = 2.0 / _road_cont->getCurrentLaneCount();
         vector<RObject*>* robj_list = robj_set->getRObjectList();
-        Point basic_p = Point(robj_set->getPosition().x-(100*ratio), robj_set->getPosition().y-(100*ratio));
+        Point basic_p = Point(robj_set->getPosition().x-100, robj_set->getPosition().y-100*ratio);
         
         for (vector<RObject*>::iterator in_it = robj_list->begin(); in_it != robj_list->end(); ++in_it) {
             RObject* robj = (RObject*)*in_it;
             Rect tmp_rect = robj->getBoundingBox();
             
             Rect robj_rect =
-                Rect(basic_p.x + 20 + tmp_rect.origin.x*ratio + ((tmp_rect.size.width/2) * (1-ratio)),
+                Rect(basic_p.x + tmp_rect.origin.x*ratio + ((tmp_rect.size.width/2) * (1-ratio)),
                     basic_p.y + tmp_rect.origin.y*ratio + ((tmp_rect.size.height/2) * (1-ratio)),
-                    tmp_rect.size.width * ratio - 20,
+                    tmp_rect.size.width * ratio,
                     tmp_rect.size.height * ratio);
+            if (robj->getRObjectType() == robj_obstacle) {
+                //CCLOG("robj %f %f h %f", robj_rect.getMinX(), robj_rect.getMaxX(), robj_rect.getMinY());
+            }
             if (ship_rect.intersectsRect(robj_rect)) {
                 _handleRObject(robj_set, robj);
                 
