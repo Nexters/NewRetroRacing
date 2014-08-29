@@ -57,11 +57,15 @@ private:
     ConflictDetector *detector;
     
     Label* speed_label;
+	char speed[10];
 
     //int roadLineNumber;
     bool isTouchDown;
     float initTouchPos[2];
 	float currTouchPos[2];
+	
+	Sprite* sBar;
+	ProgressTimer* ptBar;
 };
 
 #endif // __GAME_SCENE_H__

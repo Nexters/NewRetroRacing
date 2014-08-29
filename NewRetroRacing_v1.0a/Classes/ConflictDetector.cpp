@@ -79,7 +79,7 @@ void ConflictDetector::_handleRObject(RObjectSet* set, RObject* robj) {
     }
     else if (robj->getRObjectType() == robj_coin) {
         CCLOG("coin conflict");
-        
+		Shared::getInstance()->setCoinData(1);
     }
     set->removeRObject(robj);
     handle_flag = false;

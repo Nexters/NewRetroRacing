@@ -74,6 +74,18 @@ bool GameScene::init()
     speed_label->setAnchorPoint(Point(0.0, 0.5));
     speed_label->setPosition(Point(450.0, 1000.0));
     this->addChild(speed_label, 10);
+
+	Sprite* feverSprite = Sprite::create("fever.png");
+	feverSprite->setPosition(Vec2(74.5,1258));
+	this->addChild(feverSprite,10);
+
+	sBar = Sprite::create("gauge.png");
+	ptBar = ProgressTimer::create(sBar);
+	ptBar->setType(kCCProgressTimerTypeBar);
+	ptBar->setPosition(Vec2(217.5,1270.25));
+	ptBar->setMidpoint(Vec2(0,1));
+	ptBar->setBarChangeRate(Vec2(1,0));
+	this->addChild(ptBar,10);
     
     // update elpased time
     this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
@@ -154,7 +166,6 @@ void GameScene::update(float dt) {
     
     if (speed_label != NULL) {
         std::string *speed_str = new std::string("Speed: ");
-        char speed[10];
         sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
         speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
@@ -162,6 +173,7 @@ void GameScene::update(float dt) {
     }
     
     detector->handleConflict();
+	ptBar->setPercentage(5.0*Shared::getInstance()->getCoinData());
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();

@@ -42,6 +42,10 @@ public:
     
     void resetGameSceneData();
     void resetElapsedTime();
+
+	void setCoinData(int coin);
+	int getCoinData();
+
     
 private:
     Shared();
@@ -55,6 +59,7 @@ private:
     float screen_size_ratio;
     float current_speed;
     int cur_lane_cnt;
+	int coin_count;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include "Spaceship.h"
 #include "RObjectController.h"
 #include "GameState.h"
+#include "Shared.h"
 
 class ConflictDetector {
   

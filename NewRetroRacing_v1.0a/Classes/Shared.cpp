@@ -69,11 +69,22 @@ void Shared::resetElapsedTime() {
     elapsed_time = 0;
 }
 
+void Shared::setCoinData(int coin)
+{
+	coin_count += coin;
+}
+int Shared::getCoinData()
+{
+	return coin_count;
+}
+
+
 Shared::Shared() {
     
     elapsed_time = 0.0;
     screen_size_ratio = 1.0;
     current_speed = BASIC_SPEED;
+	coin_count=0;
 }
 Shared::~Shared() {
     
