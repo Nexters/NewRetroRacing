@@ -18,8 +18,8 @@
 /* ******** */
 
 #define SENS 0.01
-USING_NS_CC;
 
+USING_NS_CC;
 using namespace CocosDenshion;
 
 Scene* GameScene::createScene() {
@@ -55,7 +55,7 @@ bool GameScene::init()
     road_cont->attachRoadLayerTo(this, 1);
 
 // update elpased time
-    this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
+    this->schedule(schedule_selector(GameScene::updateElpasedTime), 3.0);
     this->scheduleUpdate();
 
 // test buttons
@@ -69,6 +69,8 @@ bool GameScene::init()
     robj_cont = new RObjectController(2);
     robj_cont->attachRObjectsTo(this, 4);
     road_cont->addRoadChangeObserver(robj_cont);
+    
+    detector = ConflictDetector::create(this, road_cont, s, robj_cont);
     
     speed_label = Label::create();
     speed_label->setString("Speed: 0.0");
@@ -105,6 +107,10 @@ void GameScene::initGameSceneData() {
 	listener->onTouchCancelled = CC_CALLBACK_2(GameScene::onTouchCancelled,this);
     
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
+}
+
+void GameScene::gameOver() {
+    
 }
 
 void GameScene::updateElpasedTime(float delta) {
@@ -152,6 +158,8 @@ void GameScene::update(float dt) {
         speed_label->setString(speed_str->c_str());
         free(speed_str);
     }
+    
+    detector->handleConflict();
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -292,7 +300,7 @@ void GameScene::attachTestButtons() {
 bool GameScene::buttonTouched(Touch *touch) {
     
     if (road_cont == NULL) {
-        return false;
+        //return false;
     }
     
     Point touch_location = Shared::getInstance()->adjustPoint(touch->getLocation());

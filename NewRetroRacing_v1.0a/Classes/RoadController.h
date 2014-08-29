@@ -15,6 +15,9 @@ public:
     
 	void attachRoadLayerTo(Layer* _layer, int zOrder);
 
+    Vector<Sprite*>* getHorizontalRails() { return hori_rails; }
+    int getCurrentLaneCount() { return lane_cnt; }
+    
 	bool attachLane(int how_many, int to_where);
 	bool detachLane(int how_many, int from_where);
     

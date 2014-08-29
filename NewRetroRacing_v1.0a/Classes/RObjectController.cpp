@@ -18,6 +18,8 @@ RObjectController::RObjectController(int _lane_cnt)
     is_relocating = false;
     v_range = INIT_V_RANGE;
     robj_set_list = new vector<RObjectSet*>();
+    srand(time(NULL));
+    prev_rnum = rand();
 }
 
 void RObjectController::attachRObjectsTo(Layer *_layer, int _zOrder) {
@@ -69,8 +71,6 @@ void RObjectController::onVerticalRangeChange(Vec2 range) {
 
 void RObjectController::generateRObjects(float dt) {
     
-    CCLOG("GEN");
-    
     if (parent_layer == NULL)
         return;
     if (is_relocating)
@@ -82,8 +82,7 @@ void RObjectController::generateRObjects(float dt) {
     bool all_true = true;
     
     for (int i = 0; i < lane_cnt; i++) {
-        int yn = generateRandomNumber(2-1);
-        CCLOG("ran %d", yn);
+        int yn = generateRandomNumber(2);
         if (yn == 0) {
             box[i] = true;
         }
@@ -93,7 +92,7 @@ void RObjectController::generateRObjects(float dt) {
     }
     
     if (all_true) {
-        int rn = generateRandomNumber(lane_cnt-1);
+        int rn = generateRandomNumber(lane_cnt);
         box[rn] = false;
     }
     for (int i = 0; i < lane_cnt; i++) {
@@ -200,11 +199,17 @@ void RObjectController::relocateRObects(int lane_change, int where, bool* _flag)
 
 int RObjectController::generateRandomNumber(unsigned int max) {
     
-    mt19937 engine((unsigned int)time(NULL));                    // MT19937 난수 엔진
-    uniform_int_distribution<int> distribution(0, max);       // 생성 범위
-    auto generator = bind(distribution, engine);
+    srand(time(NULL));
+    unsigned int rnum = rand();
+    if (rnum == prev_rnum) {
+        rnum = rnum % 17;
+        rnum += prev_rnum;
+    }
+    prev_rnum = rnum;
     
-    return generator();
+    int ret_val = rnum % max;
+    
+    return ret_val;
 }
 
 RObjectController::~RObjectController() {

@@ -7,6 +7,7 @@
 #define GAME_SCENE_HEIGHT 1280.0
 
 #define ROAD_WIDTH 520.0
+#define ROAD_HEIGHT 250.0
 #define RAIL_WIDTH 30.0
 #define LEFT_MARGIN 100.0
 #define MAX_LANE_CNT 4

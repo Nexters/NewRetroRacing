@@ -84,6 +84,7 @@ RObjectSet::~RObjectSet() {
 RObjectSet* RObjectSet::generateRObjectSet(RObjectSetType _type) {
     
     RObjectSet *new_set = new RObjectSet();
+    new_set->robj_list = new std::vector<RObject*>();
     new_set->_generateRObjectSet(_type);
     
     return new_set;
@@ -99,16 +100,25 @@ void RObjectSet::attachToLayer(Layer* _layer, int zOrder) {
 }
 void RObjectSet::moveDownRObjectSet() {
 
-    float moving_distance = robj_bg->getPositionY() - DESTRUCTION_POINT_Y;
+    //float moving_distance = robj_bg->getPositionY() - DESTRUCTION_POINT_Y;
+    
+    if (robj_bg->getPositionY() < DESTRUCTION_POINT_Y)
+        return;
+    
+    float ratio = robj_bg->getScale();
+    float moving_distance = ROAD_HEIGHT * ratio * 2;
     if (moving_distance < 0)
         return ;
     float moving_time = moving_distance / Shared::getInstance()->getCurrentSpeed();
     
     auto act1 = MoveBy::create(moving_time, Point(0, -moving_distance));
-    robj_bg->runAction(act1);
+    auto act1_2 = CallFunc::create(CC_CALLBACK_0(RObjectSet::moveDownRObjectSet, this));
+    auto act1_3 = Sequence::create(act1, act1_2, NULL);
+    robj_bg->runAction(act1_3);
 }
 void RObjectSet::release() {
     
+    robj_bg->stopAllActions();
     robj_bg->removeAllChildren();
     robj_bg->removeFromParent();
     
@@ -121,7 +131,6 @@ void RObjectSet::relocateRObjectSet(Vec2 _point, float scale_ratio, bool* _flag)
     auto act1 = MoveTo::create(RELOCATION_TIME, _point);
     auto act1_2 = ScaleTo::create(RELOCATION_TIME, scale_ratio);
     auto act1_3 = Spawn::create(act1, act1_2, NULL);
-    CCLOG("r1 addr %p", _flag);
     auto act1_4 = CallFuncN::create(CC_CALLBACK_1(RObjectSet::_relocateRObjectSet_callback, this, (void*)_flag));
     auto act1_5 = Sequence::create(act1_3, act1_4, NULL);
     robj_bg->runAction(act1_5);
@@ -129,21 +138,15 @@ void RObjectSet::relocateRObjectSet(Vec2 _point, float scale_ratio, bool* _flag)
 
 void RObjectSet::removeRObject(RObject* robj) {
     
-    RObject *n = robj_list;
-    RObject *p = NULL;
-    
-    while (n != NULL && n != robj_end) {
-        
-        if (n == robj) {
-            p->next_robj = n->next_robj;
+    for (std::vector<RObject*>::iterator it = robj_list->begin(); it != robj_list->end(); ++it) {
+        if ((RObject*)*it == robj) {
+            robj_list->erase(it);
             if (robj->getParent() != NULL)
                 robj->removeFromParent();
             else
                 robj->release();
-            break;
+            return;
         }
-        p = n;
-        n = n->next_robj;
     }
 }
 
@@ -194,37 +197,36 @@ void RObjectSet::_generate_setType1() {
     robj_bg->setAnchorPoint(Point(0.5, 0.5));
     robj_bg->setPosition(BASIC_POSITION);
 
-    robj_list = RObject::createRObject(robj_obstacle, obs_img);
-    robj_list->setAnchorPoint(Point(0.5, 0.5));
-    robj_list->setPosition(
-        Point(robj_bg->getBoundingBox().size.width/2, robj_bg->getBoundingBox().size.height/2));
-    robj_bg->addChild(robj_list);
-    
-    RObject *robj = robj_list;
+    RObject* obs = RObject::createRObject(robj_obstacle, obs_img);
+    obs->setAnchorPoint(Point(0.5, 0.5));
+    obs->setPosition(
+         Point(robj_bg->getBoundingBox().size.width/2, robj_bg->getBoundingBox().size.height/2));
+    robj_bg->addChild(obs);
+    robj_list->push_back(obs);
+
+    RObject *prev_robj = obs;
     for (int i = 0; i < coin_cnt; i++) {
-        robj->next_robj = RObject::createRObject(robj_coin, img_coin);
-        robj->next_robj->setAnchorPoint(Point(0.5, 0.5));
+        RObject *coin = RObject::createRObject(robj_coin, img_coin);
+        coin->setAnchorPoint(Point(0.5, 0.5));
         if (i == 0) {
-            robj->next_robj->setPosition(robj->getPositionX(),
-                                         robj->getPositionY()
-                                         - robj->getBoundingBox().size.height/2
-                                         - robj->next_robj->getBoundingBox().size.height/2 - 30);
+            coin->setPosition(obs->getPositionX(),
+                             obs->getPositionY()
+                             - obs->getBoundingBox().size.height/2
+                             - coin->getBoundingBox().size.height/2 - 30);
         }
         else {
-            robj->next_robj->setPosition(robj->getPositionX(),
-                                         robj->getPositionY() - robj->getBoundingBox().size.height - 30);
+            coin->setPosition(obs->getPositionX(),
+                              prev_robj->getPositionY() - coin->getBoundingBox().size.height - 30);
         }
-        robj_bg->addChild(robj->next_robj);
-        robj = robj->next_robj;
-        if (i == coin_cnt - 1)
-            robj_end = robj->next_robj;
+        robj_bg->addChild(coin);
+        robj_list->push_back(coin);
+        prev_robj = coin;
     }
 }
 
 void RObjectSet::_relocateRObjectSet_callback(Ref* _robj, void* _flag) {
 
     if (_flag != NULL) {
-            CCLOG("r2 addr %p", _flag);
         bool* __flag = (bool*)_flag;
         *__flag = false;
     }

@@ -16,6 +16,7 @@ public:
     ~Spaceship();
     
     void attachShipTo(Layer* layer, int zOrder);
+    Rect getRect() { return ship->getBoundingBox(); }
     
     virtual void onLaneChange(int current, int next, int to_where);
     virtual void onVerticalRangeChange(Vec2 range);

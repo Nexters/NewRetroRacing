@@ -49,6 +49,8 @@ private:
     bool start_gen_flag;
     bool is_relocating;
     int sche_cnt;
+    
+    unsigned int prev_rnum;
 };
 
 #endif

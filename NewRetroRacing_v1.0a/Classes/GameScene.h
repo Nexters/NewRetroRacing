@@ -7,8 +7,10 @@
 #include "BgLayerController.h"
 #include "Spaceship.h"
 #include "RObjectController.h"
+#include "GameState.h"
+#include "ConflictDetector.h"
 
-class GameScene : public cocos2d::Layer
+class GameScene : public cocos2d::Layer, public GameState
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -16,6 +18,8 @@ public:
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
+    
+    void gameOver();
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
@@ -24,7 +28,6 @@ public:
     CREATE_FUNC(GameScene);
     
 private:
-    
     void initGameSceneData();
     void gameOver(float delta);
     
@@ -44,9 +47,10 @@ private:
     
 private:
     BgLayerController *bg_cont;
-    RoadController* road_cont;
-    Spaceship* s;
-    RObjectController* robj_cont;
+    RoadController *road_cont;
+    Spaceship *s;
+    RObjectController *robj_cont;
+    ConflictDetector *detector;
     
     Label* speed_label;
     

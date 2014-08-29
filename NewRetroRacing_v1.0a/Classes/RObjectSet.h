@@ -55,34 +55,34 @@ private:
                             RObjectSet
    ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
 
-class RObjIterator {
-    
-public:
-    RObjIterator(RObject* _robj = 0) : _it(_robj) {}
-    RObjIterator& operator=(const RObjIterator _another) {
-        _it = _another._it;
-        return *this;
-    }
-    RObjIterator& operator++() {
-        _it = _it->next_robj;
-        return *this;
-    }
-    RObject* operator*()
-    {
-        return _it;
-    }
-    bool operator==(const RObjIterator _another)
-    {
-        return (_it == _another._it);
-    }
-    bool operator!=(const RObjIterator _another)
-    {
-        return (_it != _another._it);
-    }
-
-private:
-    RObject* _it;
-};
+//class RObjIterator {
+//    
+//public:
+//    RObjIterator(RObject* _robj = 0) : _it(_robj) {}
+//    RObjIterator& operator=(const RObjIterator _another) {
+//        _it = _another._it;
+//        return *this;
+//    }
+//    RObjIterator& operator++() {
+//        _it = _it->next_robj;
+//        return *this;
+//    }
+//    RObject* operator*()
+//    {
+//        return _it;
+//    }
+//    bool operator==(const RObjIterator _another)
+//    {
+//        return (_it == _another._it);
+//    }
+//    bool operator!=(const RObjIterator _another)
+//    {
+//        return (_it != _another._it);
+//    }
+//
+//private:
+//    RObject* _it;
+//};
 
 class RObjectSet {
     
@@ -97,13 +97,15 @@ public:
     void setLaneNumber(int num) { lane_num = num; }
     int getLaneNumber() { return lane_num; }
     
+    std::vector<RObject*>* getRObjectList() { return robj_list; }
+    
     void relocateRObjectSet(Vec2 _point, float scale_ratio, bool* _flag);
     
     void removeRObject(RObject* robj);
 
 public:
-    RObjIterator begin() { return RObjIterator(robj_list); }
-    RObjIterator end() { return RObjIterator(robj_end); }
+    //RObjIterator begin() { return RObjIterator(robj_list); }
+    //RObjIterator end() { return RObjIterator(robj_end); }
     
 private:
     void _generateRObjectSet(RObjectSetType _type);
@@ -116,13 +118,14 @@ private:
     ~RObjectSet();
     
 public:
-    friend class RObjIterator;
-    typedef RObjIterator iterator;
+    //friend class RObjIterator;
+    //typedef RObjIterator iterator;
     
 private:
     Sprite *robj_bg;
-    RObject *robj_list;
-    RObject *robj_end;
+    std::vector<RObject*>* robj_list;
+    //RObject *robj_list;
+    //RObject *robj_end;
     int lane_num;
 };
 
