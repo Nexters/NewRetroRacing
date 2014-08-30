@@ -55,7 +55,7 @@ bool GameScene::init()
     road_cont->attachRoadLayerTo(this, 1);
 
 // test buttons
-    attachTestButtons();
+    //attachTestButtons();
     
 //
     s = new Spaceship(0);
@@ -103,6 +103,7 @@ bool GameScene::init()
     // update elpased time
     this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
     this->scheduleUpdate();
+    this->schedule(schedule_selector(GameScene::roadChangeScheduler),8.0);
 
     return true;
 }
@@ -138,8 +139,9 @@ void GameScene::initGameSceneData() {
 
 void GameScene::gameOver() {
     
-    //Director::getInstance()->pause();
-    this->removeAllChildren();
+//    Director::getInstance()->pause();
+    this->pause();
+    Director::getInstance()->getScheduler()->unscheduleAll();
     Director::getInstance()->replaceScene(HelloWorld::createScene());
     //this->removeFromParent();
     //Director::getInstance()->resume();
@@ -153,7 +155,7 @@ void GameScene::updateElpasedTime(float delta) {
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     
     /* for test */
-    buttonTouched(touch);
+    //buttonTouched(touch);
     /* ******** */
     
 	initTouchPos[0] = touch->getLocation().x;
@@ -242,10 +244,10 @@ void GameScene::update(float dt) {
      
 }
 
-void GameScene::gameOver(float delta) {
+//void GameScene::gameOver(float delta) {
 
-	Director::getInstance()->replaceScene(HelloWorld::createScene());
-}
+	//
+//}
 
 
 
@@ -460,4 +462,44 @@ bool GameScene::buttonTouched(Touch *touch) {
 		CCLOG("NOT TOUCHED!!");
 		return false;
 	}
+}
+
+void GameScene::roadChangeScheduler(float dt)
+{
+    int a = rand()%10;
+    switch (a)
+    {
+        case 0:
+            road_cont->attachLane(1, 1);
+            break;
+        case 1:
+            road_cont->attachLane(1, 2);
+            break;
+        case 2:
+            road_cont->attachLane(2, 1);
+            break;
+        case 3:
+            road_cont->attachLane(2, 2);
+            break;
+        case 4:
+            road_cont->attachLane(2, 3);
+            break;
+        case 5:
+            road_cont->detachLane(1, 1);
+            break;
+        case 6:
+            road_cont->detachLane(2, 1);
+            break;
+        case 7:
+            road_cont->detachLane(1, 2);
+            break;
+        case 8:
+            road_cont->detachLane(2, 2); 
+            break;
+        case 9:
+            road_cont->detachLane(2, 3); 
+            break;
+        default:
+            break;
+    }
 }

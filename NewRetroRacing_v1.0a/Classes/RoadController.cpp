@@ -551,7 +551,7 @@ RoadController::~RoadController() {
 	if (cur_road != NULL)
 		cur_road->removeFromParent();
 	if (next_road != NULL)
-		cur_road->removeFromParent();
+		//cur_road->removeFromParent();
 	if (road_layer != NULL)
 		road_layer->removeFromParent();
     if (hori_rails != NULL) {

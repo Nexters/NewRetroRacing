@@ -118,9 +118,9 @@ void RObjectSet::moveDownRObjectSet() {
 }
 void RObjectSet::release() {
     
-    robj_bg->stopAllActions();
-    robj_bg->removeAllChildren();
-    robj_bg->removeFromParent();
+    //robj_bg->stopAllActions();
+    //robj_bg->removeAllChildren();
+    //robj_bg->removeFromParent();
     
     this->~RObjectSet();
 }

@@ -7,7 +7,7 @@
 
 #define SCHE_KEY "generate"
 #define INIT_V_RANGE Vec2(100.0, 620.0)
-#define INIT_Y_POS 1500
+#define INIT_Y_POS 1600
 
 RObjectController::RObjectController(int _lane_cnt)
 :lane_cnt(_lane_cnt) {

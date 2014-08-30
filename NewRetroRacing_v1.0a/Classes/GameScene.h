@@ -33,7 +33,7 @@ public:
     
 private:
     void initGameSceneData();
-    void gameOver(float delta);
+    //void gameOver(float delta);
     
     void updateElpasedTime(float delta);
     
@@ -48,6 +48,8 @@ private:
     void attachTestButtons();
     bool buttonTouched(Touch *touch);
     /* ******** */
+    
+    void roadChangeScheduler(float dt);
     
 private:
     BgLayerController *bg_cont;
