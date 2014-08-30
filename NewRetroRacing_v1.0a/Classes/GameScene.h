@@ -57,6 +57,7 @@ private:
     ConflictDetector *detector;
     
     Label* speed_label;
+    Label* coin_label;
 
     //int roadLineNumber;
     bool isTouchDown;

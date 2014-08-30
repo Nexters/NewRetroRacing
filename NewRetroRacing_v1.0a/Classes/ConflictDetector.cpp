@@ -2,6 +2,7 @@
 
 USING_NS_CC;
 using namespace std;
+using namespace CocosDenshion;
 
 ConflictDetector* ConflictDetector::create
 (GameState *gs, RoadController* rc, Spaceship* ss, RObjectController *roc) {
@@ -25,9 +26,34 @@ bool ConflictDetector::handleConflict() {
     Vector<Sprite*> *hori_rails = _road_cont->getHorizontalRails();
     for (vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ++it) {
 		Sprite *hori_rail = (Sprite*)*it;
-		if (ship_rect.intersectsRect(hori_rail->getBoundingBox())) {
-            hori_rail->getBoundingBox();
-            _handleHorizontalRail(hori_rail);
+        Sprite *road = (Sprite*)hori_rail->getParent();
+        Rect tmp_rect = hori_rail->getBoundingBox();
+        Rect road_rect = Rect::ZERO;
+        if (road != NULL)
+            road_rect = road->getBoundingBox();
+        
+        float ratio = 2.0 / _road_cont->getCurrentLaneCount();
+        Point basic_p = Point(road_rect.getMinX(), road_rect.getMinY());
+        
+        Rect hori_rail_rect = Rect::ZERO;
+        
+        if (tmp_rect.origin.y > GAME_SCENE_HEIGHT) {
+            hori_rail_rect =
+            Rect(basic_p.x + tmp_rect.origin.x + ((tmp_rect.size.width/2) * (1-ratio)),
+                 basic_p.y + tmp_rect.origin.y + ((tmp_rect.size.height/2) * (1-ratio)),
+                 tmp_rect.size.width * ratio,
+                 tmp_rect.size.height * ratio);
+        }
+        else {
+        }
+//        
+//        CCLOG("hori rail %f %f %f %f",
+//              hori_rail_rect.getMinX(), hori_rail_rect.getMaxX(),
+//              hori_rail_rect.getMinY(), hori_rail_rect.getMaxY()
+//              );
+		if (ship_rect.intersectsRect(hori_rail_rect)) {
+            
+            _handleHorizontalRail(hori_rails, hori_rail);
             return true;
         }
 	}
@@ -67,18 +93,30 @@ bool ConflictDetector::handleConflict() {
     return false;
 }
 
-void ConflictDetector::_handleHorizontalRail(Sprite* hori_rail) {
+void ConflictDetector::_handleHorizontalRail(Vector<Sprite*>* hori_rails, Sprite* hori_rail) {
     
     CCLOG("hori rail conflict");
+    Rect ship_rect = _ship->getRect();
+    
+//    CCLOG("shipship %f %f %f %f", ship_rect.getMinX(), ship_rect.getMaxX(), ship_rect.getMinY(), ship_rect.getMaxY());
+    
+    ssize_t index = hori_rails->getIndex(hori_rail);
+    hori_rails->erase(index);
+    
+    SimpleAudioEngine::getInstance()->playEffect("bomb.wav", false);
+    _gameState->gameOver();
     handle_flag = false;
 }
 void ConflictDetector::_handleRObject(RObjectSet* set, RObject* robj) {
    
     if (robj->getRObjectType() == robj_obstacle) {
-        CCLOG("obstacle conflict");
+        //CCLOG("obstacle conflict");
+        SimpleAudioEngine::getInstance()->playEffect("bomb.wav", false);
+        _gameState->gameOver();
     }
     else if (robj->getRObjectType() == robj_coin) {
-        CCLOG("coin conflict");
+        //CCLOG("coin conflict");
+        SimpleAudioEngine::getInstance()->playEffect("coinGet.wav", false);
 		Shared::getInstance()->setCoinData(1);
     }
     set->removeRObject(robj);

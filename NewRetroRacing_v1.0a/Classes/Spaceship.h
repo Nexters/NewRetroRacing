@@ -5,7 +5,7 @@
 #include "RoadChangeObserver.h"
 
 #define INITIAL_X (LEFT_MARGIN + RAIL_WIDTH + 115.0)
-#define INITIAL_Y 100.0
+#define INITIAL_Y 150.0
 
 #define SPEEDVAL 5
 

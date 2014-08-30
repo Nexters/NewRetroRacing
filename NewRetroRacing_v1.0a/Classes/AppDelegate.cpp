@@ -33,7 +33,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // run
     director->runWithScene(scene);
-
+    
+    SimpleAudioEngine::getInstance()->preloadEffect("coinGet.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("bomb.wav");
+    SimpleAudioEngine:: getInstance()->setEffectsVolume(0.4);
+    
     return true;
 }
 

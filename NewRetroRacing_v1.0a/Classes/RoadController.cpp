@@ -520,9 +520,10 @@ void RoadController::addHorizontalRailTo(Sprite* road, int _lane_cnt, int lane_n
 }
 void RoadController::removeHorizontalRail() {
 
-	for (std::vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ++it) {
+	for (std::vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ) {
 		Sprite *hori_rail = (Sprite*)*it;
 		hori_rail->removeFromParent();
+        it = hori_rails->erase(it);
 	}
 }
 

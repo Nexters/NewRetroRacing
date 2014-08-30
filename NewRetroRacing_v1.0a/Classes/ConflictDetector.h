@@ -18,7 +18,7 @@ private:
     ConflictDetector(GameState *gs, RoadController* rc, Spaceship* ss, RObjectController* roc);
     
     void _handleRObject(RObjectSet* set, RObject* robj);
-    void _handleHorizontalRail(Sprite* hori_rail);
+    void _handleHorizontalRail(Vector<Sprite*>* hori_rails, Sprite* hori_rail);
     
 private:
     GameState *_gameState;

@@ -140,11 +140,12 @@ void RObjectSet::removeRObject(RObject* robj) {
     
     for (std::vector<RObject*>::iterator it = robj_list->begin(); it != robj_list->end(); ++it) {
         if ((RObject*)*it == robj) {
-            robj_list->erase(it);
             if (robj->getParent() != NULL)
                 robj->removeFromParent();
             else
                 robj->release();
+            robj_list->erase(it);
+            
             return;
         }
     }

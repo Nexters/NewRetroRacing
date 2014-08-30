@@ -66,24 +66,36 @@ bool GameScene::init()
     robj_cont->attachRObjectsTo(this, 4);
     road_cont->addRoadChangeObserver(robj_cont);
     
+    robj_cont->startGeneratingRObjects();
+    
     detector = ConflictDetector::create(this, road_cont, s, robj_cont);
+    
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    float tmp = visibleSize.height / visibleSize.width;
     
     speed_label = Label::create();
     speed_label->setString("Speed: 0.0");
     speed_label->setSystemFontSize(30);
     speed_label->setAnchorPoint(Point(0.0, 0.5));
-    speed_label->setPosition(Point(450.0, 1000.0));
+    speed_label->setPosition(Point(510.0, 720 * tmp - 80));
     this->addChild(speed_label, 10);
-
+    
+    coin_label = Label::create();
+    coin_label->setString("Coin: 0");
+    coin_label->setSystemFontSize(30);
+    coin_label->setAnchorPoint(Point(0.0, 0.5));
+    coin_label->setPosition(Point(530.0, 720 * tmp - 110));
+    this->addChild(coin_label, 11);
+    
 	Sprite* feverSprite = Sprite::create("fever.png");
-	feverSprite->setPosition(Vec2(74.5,1258-200));
+	feverSprite->setPosition(Vec2(74.5,720 * tmp - 45));
 	this->addChild(feverSprite,10);
 
 	sBar = Sprite::create("gauge.png");
 	ptBar = ProgressTimer::create(sBar);
 	ptBar->setType(kCCProgressTimerTypeBar);
 	ptBar->setAnchorPoint(Vec2(0,0));
-	ptBar->setPosition(Vec2(150,1241));
+	ptBar->setPosition(Vec2(150,720 * tmp - 60));
 	ptBar->setMidpoint(Vec2(0,1));
 	ptBar->setBarChangeRate(Vec2(1,0));
 	this->addChild(ptBar,10);
@@ -98,6 +110,7 @@ bool GameScene::init()
 void GameScene::initGameSceneData() {
     
     speed_label = NULL;
+    coin_label = NULL;
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Shared* shared = Shared::getInstance();
@@ -125,12 +138,16 @@ void GameScene::initGameSceneData() {
 
 void GameScene::gameOver() {
     
+    //Director::getInstance()->pause();
+    this->removeAllChildren();
+    Director::getInstance()->replaceScene(HelloWorld::createScene());
+    //this->removeFromParent();
+    //Director::getInstance()->resume();
 }
 
 void GameScene::updateElpasedTime(float delta) {
     
     Shared::getInstance()->incrementElapsedTime((int)delta);
-
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
@@ -172,6 +189,15 @@ void GameScene::update(float dt) {
         speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
         free(speed_str);
+    }
+    
+    char coin[10] = {'\0', };
+    if (coin_label != NULL) {
+        std::string *coin_str = new std::string("Coin: ");
+        sprintf(coin, "%d", Shared::getInstance()->getCoinData());
+        coin_str->append(coin);
+        coin_label->setString(coin_str->c_str());
+        free(coin_str);
     }
     
     detector->handleConflict();
@@ -427,7 +453,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 	}
     else if (right_btn6_rect.containsPoint(touch_location)) {
 		CCLOG("RIGHT BTN6 TOUCHED!!");
-        robj_cont->startGeneratingRObjects();
+        //robj_cont->startGeneratingRObjects();
 		return true;
 	}
 	else {

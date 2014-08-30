@@ -13,8 +13,8 @@
 #define MAX_LANE_CNT 4
 
 #define SPEED_CONSTANT 10.0
-#define BASIC_SPEED 300.0
-#define SPEED_LIMIT 2000.0
+#define BASIC_SPEED 500.0
+#define SPEED_LIMIT 2200.0
 
 #define RELOCATION_TIME 0.2
 

@@ -124,7 +124,7 @@ void Spaceship::relocateShip(int lane_change, int where) {
     
     float x_pos = getXPositionOfShip(next_lane_num);
     
-    auto act1 = MoveTo::create(RELOCATION_TIME, Point(x_pos, INITIAL_Y));
+    auto act1 = MoveTo::create(RELOCATION_TIME, Point(x_pos, INITIAL_Y * ratio));
     auto act1_2 = ScaleTo::create(RELOCATION_TIME, ratio);
     auto act1_3 = Spawn::create(act1, act1_2, NULL);
     ship->runAction(act1_3);
