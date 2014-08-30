@@ -140,9 +140,10 @@ void GameScene::initGameSceneData() {
 void GameScene::gameOver() {
     
 //    Director::getInstance()->pause();
-    this->pause();
+    //this->pause();
     Director::getInstance()->getScheduler()->unscheduleAll();
     Director::getInstance()->replaceScene(HelloWorld::createScene());
+    Shared::getInstance()->releaseInstance();
     //this->removeFromParent();
     //Director::getInstance()->resume();
 }
