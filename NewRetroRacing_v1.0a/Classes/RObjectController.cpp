@@ -17,9 +17,16 @@ RObjectController::RObjectController(int _lane_cnt)
     start_gen_flag = false;
     is_relocating = false;
     v_range = INIT_V_RANGE;
-    robj_set_list = new vector<RObjectSet*>();
+    robj_set_list = new std::vector<RObjectSet*>();
     srand(time(NULL));
     prev_rnum = rand();
+}
+void RObjectController::releaseRObjCont() {
+
+    stopGeneratingRObjects();
+    removeAllRObjects();
+    
+    this->~RObjectController();
 }
 
 void RObjectController::attachRObjectsTo(Layer *_layer, int _zOrder) {
@@ -37,9 +44,12 @@ void RObjectController::startGeneratingRObjects() {
     
     sche_cnt = 0;
     float interval = GAME_SCENE_HEIGHT / Shared::getInstance()->getCurrentSpeed();
+
+    // 전역 Scheduler를 등록!! -->> stopGeneratingRObjects()에서 해제해준다.
     Director::getInstance()->getScheduler()
     ->schedule(std::bind(&RObjectController::generateRObjects, this, std::placeholders::_1),
                this, interval, false, SCHE_KEY);
+
 }
 void RObjectController::stopGeneratingRObjects() {
     
@@ -50,10 +60,16 @@ void RObjectController::stopGeneratingRObjects() {
     
     start_gen_flag = false;
 }
-void RObjectController::release() {
 
-    this->~RObjectController();
+void RObjectController::removeAllRObjects() {
+    
+    for (std::vector<RObjectSet*>::iterator it = robj_set_list->begin(); it != robj_set_list->end(); ) {
+        RObjectSet* set = *it;
+        it = robj_set_list->erase(it);
+        set->releaseRObjectSet();
+	}
 }
+
 
 void RObjectController::onLaneChange(int current, int next, int to_where) {
     
@@ -102,11 +118,12 @@ void RObjectController::generateRObjects(float dt) {
     }
     
     // 화면 밑으로 내려간 RObjectSet은 정리해준다.
-    for (vector<RObjectSet*>::iterator it = robj_set_list->begin(); it != robj_set_list->end(); ) {
+    for (std::vector<RObjectSet*>::iterator it = robj_set_list->begin();
+         it != robj_set_list->end(); ) {
         RObjectSet* set = *it;
         if (set->getPosition().y < -500) {
             it = robj_set_list->erase(it);
-            set->release();
+            set->releaseRObjectSet();
         }
         else
             ++it;
@@ -124,7 +141,7 @@ void RObjectController::generateRObjects(float dt) {
 void RObjectController::_generateRObjects(int lane_num) {
 
     float ratio = 2.0 / lane_cnt;
-    float x_pos = Shared::getXPositionOfObject(lane_cnt, lane_num, ratio);
+    float x_pos = getXPositionOfObject(lane_cnt, lane_num, ratio);
     if (x_pos < v_range.x || x_pos > v_range.y)
         return;
     
@@ -148,7 +165,8 @@ void RObjectController::relocateRObects(int lane_change, int where, bool* _flag)
     
     float ratio = 2.0 / (lane_cnt + lane_change);
     
-    for (vector<RObjectSet*>::iterator it = robj_set_list->begin(); it != robj_set_list->end(); ++it) {
+    for (std::vector<RObjectSet*>::iterator it = robj_set_list->begin();
+         it != robj_set_list->end(); ++it) {
         
         RObjectSet* set = *it;
         int cur_lane_num = set->getLaneNumber();
@@ -179,7 +197,7 @@ void RObjectController::relocateRObects(int lane_change, int where, bool* _flag)
             return ;
         }
         float old_x_pos = set->getPosition().x;
-        float new_x_pos = Shared::getXPositionOfObject(lane_cnt + lane_change, cur_lane_num, ratio);
+        float new_x_pos = getXPositionOfObject(lane_cnt + lane_change, cur_lane_num, ratio);
         float diff_x = 0.0;
         if (new_x_pos > old_x_pos)
             diff_x = new_x_pos - old_x_pos;
@@ -199,7 +217,6 @@ void RObjectController::relocateRObects(int lane_change, int where, bool* _flag)
 
 int RObjectController::generateRandomNumber(unsigned int max) {
     
-    srand(time(NULL));
     unsigned int rnum = rand();
     if (rnum == prev_rnum) {
         rnum = rnum % 17;
@@ -214,9 +231,4 @@ int RObjectController::generateRandomNumber(unsigned int max) {
 
 RObjectController::~RObjectController() {
     
-    for (vector<RObjectSet*>::iterator it = robj_set_list->begin(); it != robj_set_list->end(); ) {
-        RObjectSet* set = *it;
-        it = robj_set_list->erase(it);
-        set->release();
-	}
 }

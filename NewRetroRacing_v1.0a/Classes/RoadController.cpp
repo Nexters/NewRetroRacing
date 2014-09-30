@@ -3,6 +3,12 @@
 
 #define RAIL_HEIGHT 250.0
 
+/*
+ *
+ *  public methods
+ *
+ */
+
 RoadController::RoadController() {
 
 	road_layer = cocos2d::Layer::create();
@@ -33,10 +39,21 @@ RoadController::RoadController() {
     
 	unsetChangeRunningFlag();
 }
-void RoadController::release() {
+
+void RoadController::releaseRoadCont() {
+    
+    removeHorizontalRails();
+    delete hori_rails;
+    
+    observers->clear();
+    delete observers;
+    
+    releaseObject(next_road);
+    releaseObject(cur_road);
     
 	this->~RoadController();
 }
+
 void RoadController::attachRoadLayerTo(Layer* _layer, int zOrder) {
 
 	if (road_layer == NULL) {
@@ -45,6 +62,7 @@ void RoadController::attachRoadLayerTo(Layer* _layer, int zOrder) {
 	}
 	_layer->addChild(road_layer, zOrder);
 }
+
 bool RoadController::attachLane(int how_many, int to_where) {
 
 	if (getChangeRunningFlag())
@@ -86,6 +104,7 @@ bool RoadController::attachLane(int how_many, int to_where) {
 		return false;
 	}
 }
+
 bool RoadController::detachLane(int how_many, int from_where) {
 
 	if (getChangeRunningFlag())
@@ -142,6 +161,16 @@ void RoadController::removeRoadChangeObserver(RoadChangeObserver *observer) {
         }
 	}
 }
+
+
+
+/*
+ *
+ * private methods
+ *
+ */
+
+
 
 /*
  * sub functions of attachLane function
@@ -232,8 +261,8 @@ void RoadController::__attach_makeNewRoadAfterMovingRoads()
 // & 새로운 road에서 spaceship의 이동가능 가로 범위 설정
 {
     
-    if (!hori_rails->empty())
-        removeHorizontalRail();
+    //if (!hori_rails->empty())
+        removeHorizontalRails();
     
 	cur_road->removeFromParent();
 	cur_road = next_road;
@@ -251,6 +280,8 @@ void RoadController::__attach_makeNewRoadAfterMovingRoads()
     
 	unsetChangeRunningFlag();
 }
+
+
 
 /*
  * sub functions of detachLane function
@@ -330,8 +361,8 @@ void RoadController::__detach_scaleNextRoadAfterMovingRoads(Ref* sender, void* r
 
     float resizing_ratio = *(float*)ratio;
     
-    if (!hori_rails->empty())
-        removeHorizontalRail();
+    //if (!hori_rails->empty())
+        removeHorizontalRails();
     
     // 여기서 observers의 relocation이 필요하다. (detach lanes)
     notifyLaneChange();
@@ -363,6 +394,8 @@ void RoadController::__detach_makeNewRoadAfterScalingNextRoad()
 	unsetChangeRunningFlag();
 }
 
+
+
 /*
  * Notify Road Change
  */
@@ -384,6 +417,8 @@ void RoadController::notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2
         }
 	}
 }
+
+
 
 /*
  * road에 rail 붙이고 rail에 action 적용하는 함수
@@ -445,6 +480,8 @@ void RoadController::railAction_callback(Ref *_rail_spr, Ref* _road) {
 	rail_spr->runAction(act3);
 }
 
+
+
 /*
  * functions about pausing and resuming rail actions
  */
@@ -499,6 +536,8 @@ void RoadController::resumeRailActionsOf(Sprite* road) {
 	}
 }
 
+
+
 /*
  * functions about horizontal rail
  */
@@ -518,14 +557,16 @@ void RoadController::addHorizontalRailTo(Sprite* road, int _lane_cnt, int lane_n
 	road->addChild(hori_rail);
 	hori_rails->pushBack(hori_rail);
 }
-void RoadController::removeHorizontalRail() {
+void RoadController::removeHorizontalRails() {
 
-	for (std::vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ) {
+	for (Vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ) {
 		Sprite *hori_rail = (Sprite*)*it;
 		hori_rail->removeFromParent();
         it = hori_rails->erase(it);
 	}
 }
+
+
 
 /*
  * change running flag
@@ -543,26 +584,11 @@ bool RoadController::getChangeRunningFlag() {
     return change_running;
 }
 
+
+
 /*
  * destructor
  */
 RoadController::~RoadController() {
 
-	if (cur_road != NULL)
-		cur_road->removeFromParent();
-	if (next_road != NULL)
-		//cur_road->removeFromParent();
-	if (road_layer != NULL)
-		road_layer->removeFromParent();
-    if (hori_rails != NULL) {
-        if (hori_rails->size() != 0) {
-            // remove horizontal rails
-            //hori_rails->clear();
-        }
-        //hori_rails->~Vector();
-    }
-    if (observers != NULL) {
-        //observers->clear();
-        //observers->~Vector();
-    }
 }

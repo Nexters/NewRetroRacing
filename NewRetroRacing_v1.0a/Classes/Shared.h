@@ -28,8 +28,8 @@ public:
     static Shared* getInstance();
     static void releaseInstance();
     
+public:
     static Vec2 adjustPoint(Vec2 point);
-    static float getXPositionOfObject(int lane_cnt, int lane_num, float ratio);
     
 public:
     float getScreenSizeRatio();
@@ -61,5 +61,8 @@ private:
     int cur_lane_cnt;
 	int coin_count;
 };
+
+float getXPositionOfObject(int lane_cnt, int lane_num, float ratio);
+void releaseObject(Node *node);
 
 #endif

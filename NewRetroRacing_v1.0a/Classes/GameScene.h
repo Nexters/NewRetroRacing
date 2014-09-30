@@ -51,10 +51,12 @@ private:
     
     void roadChangeScheduler(float dt);
     
+    void releaseGameScene();
+    
 private:
     BgLayerController *bg_cont;
     RoadController *road_cont;
-    Spaceship *s;
+    Spaceship *ship;
     RObjectController *robj_cont;
     ConflictDetector *detector;
     

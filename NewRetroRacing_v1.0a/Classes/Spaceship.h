@@ -15,7 +15,7 @@ class Spaceship : public RoadChangeObserver {
     
 public:
     Spaceship(int ship_num);
-    ~Spaceship();
+    void releaseSpaceship();
     
     void attachShipTo(Layer* layer, int zOrder);
     Rect getRect() { return ship->getBoundingBox(); }
@@ -28,12 +28,13 @@ public:
 	Sprite* getSpriteSpaceShip();
 	void moveRight();
 	void moveLeft();
-    
+
 private:
     void relocateShip(int lane_change, int where);
     float getXPositionOfShip(int lane_num);
     void abc(float delta);
 	void addFire();
+    ~Spaceship();
     
 private:
     Sprite *ship;

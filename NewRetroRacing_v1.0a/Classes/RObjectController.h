@@ -7,20 +7,20 @@
 
 
 USING_NS_CC;
-using namespace std;
 
 class RObjectController : public RoadChangeObserver {
     
 public:
     RObjectController(int lane_cnt = 2);
+    void releaseRObjCont();
     void attachRObjectsTo(Layer *_layer, int _zOrder);
     
     void startGeneratingRObjects();
     void stopGeneratingRObjects();
     
-    vector<RObjectSet*>* getRObjectSetList() { return robj_set_list; }
+    void removeAllRObjects();
     
-    void release();
+    std::vector<RObjectSet*>* getRObjectSetList() { return robj_set_list; }
     
 public:
     virtual void onLaneChange(int current, int next, int to_where);
@@ -41,7 +41,7 @@ private:
     Layer *parent_layer;
     int zOrder;
     
-    vector<RObjectSet*> *robj_set_list;
+    std::vector<RObjectSet*> *robj_set_list;
     
     int lane_cnt;
     Vec2 v_range;

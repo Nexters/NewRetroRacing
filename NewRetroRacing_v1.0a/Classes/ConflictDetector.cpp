@@ -24,7 +24,7 @@ bool ConflictDetector::handleConflict() {
     
     // road controller check
     Vector<Sprite*> *hori_rails = _road_cont->getHorizontalRails();
-    for (vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ++it) {
+    for (Vector<Sprite*>::iterator it = hori_rails->begin(); it != hori_rails->end(); ++it) {
 		Sprite *hori_rail = (Sprite*)*it;
         Sprite *road = (Sprite*)hori_rail->getParent();
         Rect tmp_rect = hori_rail->getBoundingBox();
@@ -85,7 +85,7 @@ bool ConflictDetector::handleConflict() {
                 
                 return true;
             }
-        } // 무한 루프??????????????
+        }
     }
     
     handle_flag = false;
@@ -118,8 +118,8 @@ void ConflictDetector::_handleRObject(RObjectSet* set, RObject* robj) {
         //CCLOG("coin conflict");
         SimpleAudioEngine::getInstance()->playEffect("coinGet.wav", false);
 		Shared::getInstance()->setCoinData(1);
+        set->removeRObject(robj);
     }
-    set->removeRObject(robj);
     handle_flag = false;
 }
 

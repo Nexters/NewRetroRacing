@@ -15,7 +15,7 @@ RObject* RObject::createRObject(RObjectType _type, RObjectImage _image) {
     
     RObject* new_robj = new (std::nothrow) RObject();
     
-    new_robj->next_robj = NULL;
+    //new_robj->next_robj = NULL;
     
     switch (_type) {
         case robj_obstacle:
@@ -61,11 +61,11 @@ RObject* RObject::createRObject(RObjectType _type, RObjectImage _image) {
     if (new_robj && new_robj->initWithFile(file_name->c_str()))
     {
         new_robj->autorelease();
-        free(file_name);
+        delete file_name;
         return new_robj;
     }
     
-    free(file_name);
+    delete file_name;
     CC_SAFE_DELETE(new_robj);
     return nullptr;
 }
@@ -73,13 +73,6 @@ RObject* RObject::createRObject(RObjectType _type, RObjectImage _image) {
 /* ***** ***** ***** ***** ***** ***** ***** ***** ***** *****
                             RObjectSet
    ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
-
-RObjectSet::RObjectSet() {
-    
-}
-RObjectSet::~RObjectSet() {
-    
-}
 
 RObjectSet* RObjectSet::generateRObjectSet(RObjectSetType _type) {
     
@@ -89,6 +82,26 @@ RObjectSet* RObjectSet::generateRObjectSet(RObjectSetType _type) {
     
     return new_set;
 }
+
+void RObjectSet::releaseRObjectSet() {
+    
+    for (std::vector<RObject*>::iterator it = robj_list->begin(); it != robj_list->end(); ) {
+        RObject* robj = (RObject*)(*it);
+        robj_list->erase(it);
+        releaseObject(robj);
+    }
+    robj_list->clear();
+    delete robj_list;
+    releaseObject(robj_bg);
+    
+//    robj_bg->stopAllActions();
+//    robj_bg->removeAllChildren();
+//    robj_bg->removeFromParent();
+    
+    this->~RObjectSet();
+}
+
+
 void RObjectSet::locateRObjectSet(Vec2 _point, float scale_ratio) {
     
     robj_bg->setScale(scale_ratio);
@@ -99,8 +112,6 @@ void RObjectSet::attachToLayer(Layer* _layer, int zOrder) {
     _layer->addChild(robj_bg, zOrder);
 }
 void RObjectSet::moveDownRObjectSet() {
-
-    //float moving_distance = robj_bg->getPositionY() - DESTRUCTION_POINT_Y;
     
     if (robj_bg->getPositionY() < DESTRUCTION_POINT_Y)
         return;
@@ -116,14 +127,7 @@ void RObjectSet::moveDownRObjectSet() {
     auto act1_3 = Sequence::create(act1, act1_2, NULL);
     robj_bg->runAction(act1_3);
 }
-void RObjectSet::release() {
-    
-    //robj_bg->stopAllActions();
-    //robj_bg->removeAllChildren();
-    //robj_bg->removeFromParent();
-    
-    this->~RObjectSet();
-}
+// 지정한 _point로 이동, 지정한 scale_ratio로 사이즈 조절.
 void RObjectSet::relocateRObjectSet(Vec2 _point, float scale_ratio, bool* _flag) {
     
     robj_bg->stopAllActions();
@@ -138,16 +142,17 @@ void RObjectSet::relocateRObjectSet(Vec2 _point, float scale_ratio, bool* _flag)
 
 void RObjectSet::removeRObject(RObject* robj) {
     
-    for (std::vector<RObject*>::iterator it = robj_list->begin(); it != robj_list->end(); ++it) {
+    if (robj_list->empty())
+        return;
+    
+    for (std::vector<RObject*>::iterator it = robj_list->begin(); it != robj_list->end();) {
+
         if ((RObject*)*it == robj) {
-            if (robj->getParent() != NULL)
-                robj->removeFromParent();
-            else
-                robj->release();
             robj_list->erase(it);
-            
+            releaseObject(robj);
             return;
         }
+        ++it;
     }
 }
 
@@ -232,4 +237,11 @@ void RObjectSet::_relocateRObjectSet_callback(Ref* _robj, void* _flag) {
         *__flag = false;
     }
     moveDownRObjectSet();
+}
+
+RObjectSet::RObjectSet() {
+    
+}
+RObjectSet::~RObjectSet() {
+    
 }

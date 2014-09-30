@@ -58,9 +58,9 @@ bool GameScene::init()
     //attachTestButtons();
     
 //
-    s = new Spaceship(0);
-    s->attachShipTo(this, 3);
-    road_cont->addRoadChangeObserver(s);
+    ship = new Spaceship(0);
+    ship->attachShipTo(this, 3);
+    road_cont->addRoadChangeObserver(ship);
     
     robj_cont = new RObjectController(2);
     robj_cont->attachRObjectsTo(this, 4);
@@ -68,7 +68,7 @@ bool GameScene::init()
     
     robj_cont->startGeneratingRObjects();
     
-    detector = ConflictDetector::create(this, road_cont, s, robj_cont);
+    detector = ConflictDetector::create(this, road_cont, ship, robj_cont);
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     float tmp = visibleSize.height / visibleSize.width;
@@ -139,18 +139,13 @@ void GameScene::initGameSceneData() {
 
 void GameScene::gameOver() {
     
-//    Director::getInstance()->pause();
-    //this->pause();
-    Director::getInstance()->getScheduler()->unscheduleAll();
-    Director::getInstance()->replaceScene(HelloWorld::createScene());
-    Shared::getInstance()->releaseInstance();
-    //this->removeFromParent();
-    //Director::getInstance()->resume();
+    releaseGameScene();
 }
 
 void GameScene::updateElpasedTime(float delta) {
     
-    Shared::getInstance()->incrementElapsedTime((int)delta);
+    //Shared::getInstance()->incrementElapsedTime((int)delta);
+    Shared::getInstance()->incrementElapsedTime(1);
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
@@ -213,31 +208,31 @@ void GameScene::update(float dt) {
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
 		{
-			float leftsize = s->getSpaceShipPos().x;
-			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
-			if (leftsize <= s->getMoveRange().x || running>0)
+			float leftsize = ship->getSpaceShipPos().x;
+			int running = ship->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (leftsize <= ship->getMoveRange().x || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Left ");
-				s->moveLeft();
+				ship->moveLeft();
 			}
 			isTouchDown=false;
 		}
 		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
 		{
-			float rightsize = s->getSpaceShipPos().x;
-			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
-			if (rightsize >= s->getMoveRange().y || running>0)
+			float rightsize = ship->getSpaceShipPos().x;
+			int running = ship->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (rightsize >= ship->getMoveRange().y || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Right ");
-				s->moveRight();
+				ship->moveRight();
 			}
 			isTouchDown=false;
 		}
@@ -503,4 +498,14 @@ void GameScene::roadChangeScheduler(float dt)
         default:
             break;
     }
+}
+
+void GameScene::releaseGameScene() {
+    
+    ship->releaseSpaceship();
+    robj_cont->releaseRObjCont();
+    road_cont->releaseRoadCont();
+    bg_cont->releaseBgLayerCont();
+    
+    Director::getInstance()->replaceScene(HelloWorld::createScene());
 }

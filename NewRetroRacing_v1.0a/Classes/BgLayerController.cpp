@@ -74,8 +74,11 @@ void BgLayerController::bgActions_callback(Ref* _bg_spr) {
     }
 }
 
-void BgLayerController::release() {
+void BgLayerController::releaseBgLayerCont() {
     
+    releaseObject(bg_spr1);
+    releaseObject(bg_spr2);
+    releaseObject(bg_layer);
     this->~BgLayerController();
 }
 

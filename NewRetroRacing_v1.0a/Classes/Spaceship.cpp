@@ -23,7 +23,7 @@ Spaceship::Spaceship(int ship_num) {
     cur_lane_num = 0;
     ratio = 1.0;
     distance = (ROAD_WIDTH - (RAIL_WIDTH * ratio * 2)) / num_lane;
-    CCLOG("dis %f %d", distance, num_lane );
+    //CCLOG("dis %f %d", distance, num_lane );
     
     ship = Sprite::create(ship_name->c_str());
     ship->setAnchorPoint(Point(0.5, 0.5));
@@ -31,9 +31,6 @@ Spaceship::Spaceship(int ship_num) {
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
 	addFire();
-}
-Spaceship::~Spaceship() {
-    
 }
 
 void Spaceship::addFire()
@@ -44,7 +41,7 @@ void Spaceship::addFire()
 
 	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
     cache->addSpriteFramesWithFile("fire.plist");
-	Animation* animation = Animation::create();
+	auto animation = Animation::create();
 	animation->setDelayPerUnit(0.2f);
 	animation->addSpriteFrameWithFileName("fire_1.png");
 	animation->addSpriteFrameWithFileName("fire_2.png");
@@ -158,13 +155,23 @@ Sprite* Spaceship::getSpriteSpaceShip()
 void Spaceship::moveRight()
 {
 	cur_lane_num++;
-	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(distance,0));
+	auto act = MoveBy::create(0.01*SPEEDVAL,Vec2(distance,0));
 	ship->runAction(act);
 }
 
 void Spaceship::moveLeft()
 {
 	cur_lane_num--;
-	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(-distance,0));
+	auto act = MoveBy::create(0.01*SPEEDVAL,Vec2(-distance,0));
 	ship->runAction(act);
+}
+
+void Spaceship::releaseSpaceship() {
+    
+    releaseObject(ship);
+    this->~Spaceship();
+}
+
+Spaceship::~Spaceship() {
+    
 }
