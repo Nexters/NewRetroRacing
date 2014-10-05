@@ -14,11 +14,12 @@
 #define RIGHT_BTN_TAG3	22
 #define RIGHT_BTN_TAG4	23
 #define RIGHT_BTN_TAG5	24
+#define RIGHT_BTN_TAG6	25
 /* ******** */
 
 #define SENS 0.01
-USING_NS_CC;
 
+USING_NS_CC;
 using namespace CocosDenshion;
 
 Scene* GameScene::createScene() {
@@ -53,20 +54,56 @@ bool GameScene::init()
     road_cont = new RoadController();
     road_cont->attachRoadLayerTo(this, 1);
 
-// update elpased time
-    this->schedule(schedule_selector(GameScene::updateElpasedTime), 5.0);
-    
 // test buttons
-    attachTestButtons();
+    //attachTestButtons();
     
 //
-    s = new Spaceship(0);
-    s->attachShipTo(this, 3);
-    road_cont->addRoadChangeObserver(s);
-
-	this->scheduleUpdate();
+    ship = new Spaceship(0);
+    ship->attachShipTo(this, 3);
+    road_cont->addRoadChangeObserver(ship);
     
-    CCLOG("s type: %d", s->getObserverType());
+    robj_cont = new RObjectController(2);
+    robj_cont->attachRObjectsTo(this, 4);
+    road_cont->addRoadChangeObserver(robj_cont);
+    
+    robj_cont->startGeneratingRObjects();
+    
+    detector = ConflictDetector::create(this, road_cont, ship, robj_cont);
+    
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    float tmp = visibleSize.height / visibleSize.width;
+    
+    speed_label = Label::create();
+    speed_label->setString("Speed: 0.0");
+    speed_label->setSystemFontSize(30);
+    speed_label->setAnchorPoint(Point(0.0, 0.5));
+    speed_label->setPosition(Point(510.0, 720 * tmp - 80));
+    this->addChild(speed_label, 10);
+    
+    coin_label = Label::create();
+    coin_label->setString("Coin: 0");
+    coin_label->setSystemFontSize(30);
+    coin_label->setAnchorPoint(Point(0.0, 0.5));
+    coin_label->setPosition(Point(530.0, 720 * tmp - 110));
+    this->addChild(coin_label, 11);
+    
+	Sprite* feverSprite = Sprite::create("fever.png");
+	feverSprite->setPosition(Vec2(74.5,720 * tmp - 45));
+	this->addChild(feverSprite,10);
+
+	sBar = Sprite::create("gauge.png");
+	ptBar = ProgressTimer::create(sBar);
+	ptBar->setType(kCCProgressTimerTypeBar);
+	ptBar->setAnchorPoint(Vec2(0,0));
+	ptBar->setPosition(Vec2(150,720 * tmp - 60));
+	ptBar->setMidpoint(Vec2(0,1));
+	ptBar->setBarChangeRate(Vec2(1,0));
+	this->addChild(ptBar,10);
+    
+    // update elpased time
+    this->schedule(schedule_selector(GameScene::updateElpasedTime), 1.0);
+    this->scheduleUpdate();
+    this->schedule(schedule_selector(GameScene::roadChangeScheduler),8.0);
 
 	blendLayer = LayerColor::create( Color4B(255, 255, 255, 0) );
 	this->addChild(blendLayer,100,123);
@@ -76,6 +113,9 @@ bool GameScene::init()
 }
 
 void GameScene::initGameSceneData() {
+    
+    speed_label = NULL;
+    coin_label = NULL;
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Shared* shared = Shared::getInstance();
@@ -88,7 +128,7 @@ void GameScene::initGameSceneData() {
     isTouchDown=false;
 	initTouchPos[0]=0;
 	initTouchPos[1]=0;
-	roadLineNumber=2;
+	//roadLineNumber=2;
     
     auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -101,15 +141,21 @@ void GameScene::initGameSceneData() {
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
 }
 
+void GameScene::gameOver() {
+    
+    releaseGameScene();
+}
+
 void GameScene::updateElpasedTime(float delta) {
     
-    Shared::getInstance()->incrementElapsedTime((int)delta);
+    //Shared::getInstance()->incrementElapsedTime((int)delta);
+    Shared::getInstance()->incrementElapsedTime(1);
 }
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
     
     /* for test */
-    buttonTouched(touch);
+    //buttonTouched(touch);
     /* ******** */
     
 	initTouchPos[0] = touch->getLocation().x;
@@ -137,48 +183,71 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 }
 
 void GameScene::update(float dt) {
+
+    char speed[10] = {'\0', };
+    if (speed_label != NULL) {
+        std::string *speed_str = new std::string("Speed: ");
+        sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
+        speed_str->append(speed);
+        speed_label->setString(speed_str->c_str());
+        free(speed_str);
+    }
+    
+    char coin[10] = {'\0', };
+    if (coin_label != NULL) {
+        std::string *coin_str = new std::string("Coin: ");
+        sprintf(coin, "%d", Shared::getInstance()->getCoinData());
+        coin_str->append(coin);
+        coin_label->setString(coin_str->c_str());
+        free(coin_str);
+    }
+    
+    detector->handleConflict();
+	ptBar->setPercentage(5.0*Shared::getInstance()->getCoinData());
     
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
 	if(true==isTouchDown)
 	{
 		if(initTouchPos[0]-currTouchPos[0] > visibleSize.width*SENS)
 		{
-			float leftsize = s->getSpaceShipPos().x;
-			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
-			if (leftsize <= s->getMoveRange().x || running>0)
+			float leftsize = ship->getSpaceShipPos().x;
+			int running = ship->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (leftsize <= ship->getMoveRange().x || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Left ");
-				s->moveLeft();
+				ship->moveLeft();
 			}
 			isTouchDown=false;
 		}
 		else if(initTouchPos[0]-currTouchPos[0] < -visibleSize.width*SENS)
 		{
-			float rightsize = s->getSpaceShipPos().x;
-			int running = s->getSpriteSpaceShip()->getNumberOfRunningActions();
-			if (rightsize >= s->getMoveRange().y || running>0)
+			float rightsize = ship->getSpaceShipPos().x;
+			int running = ship->getSpriteSpaceShip()->getNumberOfRunningActions();
+			if (rightsize >= ship->getMoveRange().y || running>0)
 			{
 
 			}
 			else
 			{
 				CCLOG("Right ");
-				s->moveRight();
+				ship->moveRight();
 			}
 			isTouchDown=false;
 		}
 	}
+     
 }
 
-void GameScene::gameOver(float delta) {
+//void GameScene::gameOver(float delta) {
 
-	Director::getInstance()->replaceScene(HelloWorld::createScene());
-}
+	//
+//}
 
 
 void GameScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
@@ -305,12 +374,20 @@ void GameScene::attachTestButtons() {
 	left_btn6->setScale(2.0);
 	left_btn6->setTag(LEFT_BTN_TAG6);
 	this->addChild(left_btn6,3);
+    
+    auto right_btn6 = Sprite::create("CloseSelected.png");
+	right_btn6->setAnchorPoint(Point(0.5, 0.5));
+	right_btn6->setPosition(Point(720 - 40, 900));
+	right_btn6->setScale(2.0);
+	right_btn6->setTag(RIGHT_BTN_TAG6);
+	this->addChild(right_btn6,3);
 }
 
 bool GameScene::buttonTouched(Touch *touch) {
     
-    if (road_cont == NULL)
-        return false;
+    if (road_cont == NULL) {
+        //return false;
+    }
     
     Point touch_location = Shared::getInstance()->adjustPoint(touch->getLocation());
     
@@ -348,6 +425,9 @@ bool GameScene::buttonTouched(Touch *touch) {
     
 	Sprite *right_btn5 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG5);
 	Rect right_btn5_rect = right_btn5->getBoundingBox();
+    
+    Sprite *right_btn6 = (Sprite*)this->getChildByTag(RIGHT_BTN_TAG6);
+	Rect right_btn6_rect = right_btn6->getBoundingBox();
     
     
 	if (left_btn1_rect.containsPoint(touch_location)) {
@@ -415,8 +495,63 @@ bool GameScene::buttonTouched(Touch *touch) {
         Shared::getInstance()->resetElapsedTime();
 		return true;
 	}
+    else if (right_btn6_rect.containsPoint(touch_location)) {
+		CCLOG("RIGHT BTN6 TOUCHED!!");
+        //robj_cont->startGeneratingRObjects();
+		return true;
+	}
 	else {
 		CCLOG("NOT TOUCHED!!");
 		return false;
 	}
+}
+
+void GameScene::roadChangeScheduler(float dt)
+{
+    int a = rand()%10;
+    switch (a)
+    {
+        case 0:
+            road_cont->attachLane(1, 1);
+            break;
+        case 1:
+            road_cont->attachLane(1, 2);
+            break;
+        case 2:
+            road_cont->attachLane(2, 1);
+            break;
+        case 3:
+            road_cont->attachLane(2, 2);
+            break;
+        case 4:
+            road_cont->attachLane(2, 3);
+            break;
+        case 5:
+            road_cont->detachLane(1, 1);
+            break;
+        case 6:
+            road_cont->detachLane(2, 1);
+            break;
+        case 7:
+            road_cont->detachLane(1, 2);
+            break;
+        case 8:
+            road_cont->detachLane(2, 2); 
+            break;
+        case 9:
+            road_cont->detachLane(2, 3); 
+            break;
+        default:
+            break;
+    }
+}
+
+void GameScene::releaseGameScene() {
+    
+    ship->releaseSpaceship();
+    robj_cont->releaseRObjCont();
+    road_cont->releaseRoadCont();
+    bg_cont->releaseBgLayerCont();
+    
+    Director::getInstance()->replaceScene(HelloWorld::createScene());
 }

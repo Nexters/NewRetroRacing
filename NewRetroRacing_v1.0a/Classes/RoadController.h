@@ -11,10 +11,13 @@ class RoadController {
 
 public:
 	RoadController();
-	void release();
+	void releaseRoadCont();
     
 	void attachRoadLayerTo(Layer* _layer, int zOrder);
 
+    Vector<Sprite*>* getHorizontalRails() { return hori_rails; }
+    int getCurrentLaneCount() { return prev_lane_cnt; }
+    
 	bool attachLane(int how_many, int to_where);
 	bool detachLane(int how_many, int from_where);
     
@@ -43,11 +46,10 @@ private:
 	void resumeRailActionsOf(Sprite* road);
     
 	void addHorizontalRailTo(Sprite* road, int _num_lane, int lane_num);
-	void removeHorizontalRail();
+	void removeHorizontalRails();
     
 private:
-    void notifyLaneIncrement();
-    void notifyLaneDecrement();
+    void notifyLaneChange();
     void notifyCurrentValidHorizontalRange(ObserverType o_type, Vec2 range);
     
 private:
@@ -62,14 +64,14 @@ private:
 	Layer *road_layer;
 	Sprite *cur_road;
 	Sprite *next_road;
-	Vector<Sprite*> *hori_rails;
-    vector<RoadChangeObserver*> *observers;
+    Vector<Sprite*> *hori_rails;
+    std::vector<RoadChangeObserver*> *observers;
     
-	int lane_count;
+	int lane_cnt;
 	bool change_running;
     
 private:
-    int tmp_how_many;
+    int prev_lane_cnt;
     int tmp_where;
 };
 

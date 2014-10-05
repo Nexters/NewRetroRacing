@@ -10,15 +10,16 @@ class BgLayerController {
 public:
     
     BgLayerController();
-    ~BgLayerController();
+    void releaseBgLayerCont();
     
     void initBgLayerWithDefault();
     void attachBgLayerTo(Layer* _layer, int zOrder);
     void runBgActions();
-    void release();
+    
     
 private:
     void bgActions_callback(Ref* _bg_spr);
+    ~BgLayerController();
     
 private:
     Layer *bg_layer;

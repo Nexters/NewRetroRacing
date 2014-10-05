@@ -23,7 +23,7 @@ Spaceship::Spaceship(int ship_num) {
     cur_lane_num = 0;
     ratio = 1.0;
     distance = (ROAD_WIDTH - (RAIL_WIDTH * ratio * 2)) / num_lane;
-    CCLOG("dis %f %d", distance, num_lane );
+    //CCLOG("dis %f %d", distance, num_lane );
     
     ship = Sprite::create(ship_name->c_str());
     ship->setAnchorPoint(Point(0.5, 0.5));
@@ -31,9 +31,6 @@ Spaceship::Spaceship(int ship_num) {
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
 	addFire();
-}
-Spaceship::~Spaceship() {
-    
 }
 
 void Spaceship::addFire()
@@ -44,7 +41,7 @@ void Spaceship::addFire()
 
 	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
     cache->addSpriteFramesWithFile("fire.plist");
-	Animation* animation = Animation::create();
+	auto animation = Animation::create();
 	animation->setDelayPerUnit(0.2f);
 	animation->addSpriteFrameWithFileName("fire_1.png");
 	animation->addSpriteFrameWithFileName("fire_2.png");
@@ -64,13 +61,9 @@ void Spaceship::attachShipTo(Layer* layer, int zOrder) {
     layer->addChild(ship, zOrder);
 }
 
-void Spaceship::onLaneIncrement(int how_many, int to_where) {
+void Spaceship::onLaneChange(int current, int next, int to_where) {
     
-    relocateShip(how_many, to_where);
-}
-void Spaceship::onLaneDecrement(int how_many, int from_where) {
-    
-    relocateShip(-how_many, from_where);
+    relocateShip(next - current, to_where);
 }
 
 void Spaceship::onVerticalRangeChange(Vec2 range) {
@@ -128,7 +121,7 @@ void Spaceship::relocateShip(int lane_change, int where) {
     
     float x_pos = getXPositionOfShip(next_lane_num);
     
-    auto act1 = MoveTo::create(RELOCATION_TIME, Point(x_pos, INITIAL_Y));
+    auto act1 = MoveTo::create(RELOCATION_TIME, Point(x_pos, INITIAL_Y * ratio));
     auto act1_2 = ScaleTo::create(RELOCATION_TIME, ratio);
     auto act1_3 = Spawn::create(act1, act1_2, NULL);
     ship->runAction(act1_3);
@@ -162,13 +155,23 @@ Sprite* Spaceship::getSpriteSpaceShip()
 void Spaceship::moveRight()
 {
 	cur_lane_num++;
-	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(distance,0));
+	auto act = MoveBy::create(0.01*SPEEDVAL,Vec2(distance,0));
 	ship->runAction(act);
 }
 
 void Spaceship::moveLeft()
 {
 	cur_lane_num--;
-	MoveBy* act = MoveBy::create(0.01*SPEEDVAL,Vec2(-distance,0));
+	auto act = MoveBy::create(0.01*SPEEDVAL,Vec2(-distance,0));
 	ship->runAction(act);
+}
+
+void Spaceship::releaseSpaceship() {
+    
+    releaseObject(ship);
+    this->~Spaceship();
+}
+
+Spaceship::~Spaceship() {
+    
 }
