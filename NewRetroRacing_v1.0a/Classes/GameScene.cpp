@@ -183,15 +183,15 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 }
 
 void GameScene::update(float dt) {
-
-    char speed[10] = {'\0', };
+	/*
+    char speed[10]={'\0',};
     if (speed_label != NULL) {
         std::string *speed_str = new std::string("Speed: ");
         sprintf(speed, "%f", Shared::getInstance()->getCurrentSpeed());
         speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
         free(speed_str);
-    }
+    }*/
     
     char coin[10] = {'\0', };
     if (coin_label != NULL) {

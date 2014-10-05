@@ -70,13 +70,10 @@ private:
     bool isTouchDown;
     float initTouchPos[2];
 	float currTouchPos[2];
-<<<<<<< HEAD
 	LayerColor* blendLayer;
-=======
 	
 	Sprite* sBar;
 	ProgressTimer* ptBar;
->>>>>>> origin/master
 };
 
 #endif // __GAME_SCENE_H__
