@@ -91,6 +91,15 @@ int Shared::getCoinData()
 	return coin_count;
 }
 
+bool Shared::isFeverMode()
+{
+	return feverModeBit;
+}
+void Shared::setFeverMode(bool bit)
+{
+	feverModeBit = bit;
+}
+
 
 Shared::Shared() {
     

@@ -60,6 +60,13 @@ private:
     float current_speed;
     int cur_lane_cnt;
 	int coin_count;
+
+private:
+	bool feverModeBit;
+
+public:
+	bool isFeverMode();
+	void setFeverMode(bool bit);
 };
 
 float getXPositionOfObject(int lane_cnt, int lane_num, float ratio);

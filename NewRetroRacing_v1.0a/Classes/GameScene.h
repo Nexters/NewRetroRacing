@@ -6,6 +6,7 @@
 
 
 #include "cocos2d.h"
+#include "Box2D\Box2D.h"
 #include "Shared.h"
 #include "RoadController.h"
 #include "BgLayerController.h"
@@ -74,6 +75,20 @@ private:
 	
 	Sprite* sBar;
 	ProgressTimer* ptBar;
+
+
+	//for physics world
+private:
+	cocos2d::PhysicsWorld* pWorld;
+	void setPhysicsWorld(cocos2d::PhysicsWorld* world){  pWorld = world;  };
+
+	void testMakeObstacle(float dt);
+
+	bool onContactBegin(cocos2d::PhysicsContact & contact);
+	void onContactFin(cocos2d::PhysicsContact & contact);
+
+
+
 };
 
 #endif // __GAME_SCENE_H__

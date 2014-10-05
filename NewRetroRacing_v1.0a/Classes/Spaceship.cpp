@@ -28,6 +28,14 @@ Spaceship::Spaceship(int ship_num) {
     ship = Sprite::create(ship_name->c_str());
     ship->setAnchorPoint(Point(0.5, 0.5));
     ship->setPosition(Point(getXPositionOfShip(cur_lane_num), INITIAL_Y));
+
+	auto spriteBody = PhysicsBody::createBox(ship->getContentSize(),PhysicsMaterial(0,1,0));
+	spriteBody->setCollisionBitmask(1);
+	spriteBody->setContactTestBitmask(true);
+	spriteBody->setDynamic(false);
+	ship->setPhysicsBody(spriteBody);
+
+
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
 	addFire();
@@ -39,8 +47,6 @@ void Spaceship::addFire()
 	sFire->setTag(777);
 	sFire->setPosition(Vec2(85,-20));
 
-	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
-    cache->addSpriteFramesWithFile("fire.plist");
 	auto animation = Animation::create();
 	animation->setDelayPerUnit(0.2f);
 	animation->addSpriteFrameWithFileName("fire_1.png");

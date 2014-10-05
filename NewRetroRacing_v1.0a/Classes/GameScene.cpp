@@ -24,8 +24,12 @@ using namespace CocosDenshion;
 
 Scene* GameScene::createScene() {
 
-	auto scene = Scene::create();
+	auto scene = Scene::createWithPhysics();
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+
+
     auto layer = GameScene::create();
+	layer->setPhysicsWorld(scene->getPhysicsWorld());
 
     scene->addChild(layer);
 
@@ -66,7 +70,7 @@ bool GameScene::init()
     robj_cont->attachRObjectsTo(this, 4);
     road_cont->addRoadChangeObserver(robj_cont);
     
-    robj_cont->startGeneratingRObjects();
+    //robj_cont->startGeneratingRObjects();
     
     detector = ConflictDetector::create(this, road_cont, ship, robj_cont);
     
@@ -253,7 +257,7 @@ void GameScene::update(float dt) {
 void GameScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
 	
-	if(keyCode== EventKeyboard::KeyCode::KEY_MENU)
+	if(keyCode== EventKeyboard::KeyCode::KEY_MENU || keyCode == EventKeyboard::KeyCode::KEY_1 )
 	{
 		if(getOpacity()==0)
 		{
@@ -283,17 +287,125 @@ void GameScene::feverMode()
 	{
 		src = GL_SRC_ALPHA;
 		dst = GL_ONE_MINUS_SRC_ALPHA;
+		CCLog("feverMode on");
 	}
 	else
 	{
 		src = GL_ONE_MINUS_DST_COLOR;
 		dst = GL_ZERO;
+		CCLog("feverMode off");
 	}
 
 	BlendFunc bf = {src, dst};
 	layer->setBlendFunc( bf );
-}
+
+	//test set feverMode spaceShip
+	/*
+	if(!ship->getSpriteSpaceShip()->getPhysicsBody())
+	{//normal -> fever
+		Sprite* s = ship->getSpriteSpaceShip();
+		auto spriteBody = PhysicsBody::create();
+		spriteBody->setDynamic(false);
+		s->setPhysicsBody(spriteBody);
+	}
+	else
+	{//feverMode -> normal
+		Sprite* s = ship->getSpriteSpaceShip();
+		s->setPhysicsBody(NULL);
+	}
+	*/
+	CCLog("feverMode physics set on SpaceShip");
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	//set of collision detection
+	auto contactListener = EventListenerPhysicsContact::create();
+	contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin,this);
+	contactListener->onContactSeperate = CC_CALLBACK_1(GameScene::onContactFin,this);
+	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener,this);
+	this->schedule(schedule_selector(GameScene::testMakeObstacle),1.0);
+
+
+	auto edgeBody = PhysicsBody::createEdgeBox(Size(visibleSize.width,visibleSize.height+2000),PHYSICSBODY_MATERIAL_DEFAULT,3);
+	edgeBody->setCollisionBitmask(3);
+	edgeBody->setContactTestBitmask(true);
+	
+	auto edgeNode = Node::create();
+	edgeNode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
+	edgeNode->setPhysicsBody(edgeBody);
+
+	this->addChild(edgeNode);
+
+} 
 // for test
+//for test fever mode collision detection
+bool GameScene::onContactBegin(cocos2d::PhysicsContact & contact)
+{
+	PhysicsBody *a = contact.getShapeA()->getBody();
+	PhysicsBody *b = contact.getShapeB()->getBody();
+
+	//if collided
+	if((1==a->getCollisionBitmask()&&2==b->getCollisionBitmask())||
+		(2==a->getCollisionBitmask()&&1==b->getCollisionBitmask()))
+	{
+		CCLog("Collision!");
+		if(a->getCollisionBitmask()==2)
+		{
+			
+		}
+		if(b->getCollisionBitmask()==2)
+		{
+			
+		}
+	}
+	
+	return true;
+
+}
+void GameScene::onContactFin(cocos2d::PhysicsContact & contact)
+{
+	PhysicsBody *a = contact.getShapeA()->getBody();
+	PhysicsBody *b = contact.getShapeB()->getBody();
+
+	if((2==a->getCollisionBitmask()&&3==b->getCollisionBitmask())||
+		(3==a->getCollisionBitmask()&&2==b->getCollisionBitmask()))
+	{
+		CCLog("Collision on wall");
+		if(a->getCollisionBitmask()==2)
+		{
+			a->removeFromWorld();
+		}
+		if(b->getCollisionBitmask()==2)
+		{
+			b->removeFromWorld();
+		}
+	}
+}
+
+//test for make obstacle (physics body)
+void GameScene::testMakeObstacle(float dt)
+{
+	Sprite* s = Sprite::create("feverObs.png");
+	s->setAnchorPoint(Vec2());
+	s->setPosition(Vec2(200,1300));
+	this->addChild(s,5);
+	
+	for(int i=0;i<9;i++)
+	{
+		Sprite* a = Sprite::create("obstacle_fever.png");
+		a->setPosition(Vec2((i%3)*40+20+200,(i/3)*40+20+1300));
+
+		auto spriteBody = PhysicsBody::createBox(a->getContentSize(),PhysicsMaterial(0,1,0));
+		spriteBody->setCollisionBitmask(2);
+		spriteBody->setContactTestBitmask(true);
+		spriteBody->setVelocity(Vect(0,(float)1));
+		spriteBody->setAngularVelocityLimit(200);
+
+		a->setPhysicsBody(spriteBody);
+		s->addChild(a);
+
+	}
+	
+
+}
 
 void GameScene::attachTestButtons() {
     
