@@ -113,6 +113,7 @@ bool GameScene::init()
 	this->addChild(blendLayer,100,123);
 	this->setKeypadEnabled(true);
 
+	CCLog("spaceShip Pos : %f, %f",ship->getSpaceShipPos().x,ship->getSpaceShipPos().y);
     return true;
 }
 
@@ -187,6 +188,11 @@ void GameScene::onTouchCancelled(Touch* touch, Event* event) {
 }
 
 void GameScene::update(float dt) {
+	//spaceShip position setting for physics body 
+	if(Shared::getInstance()->getCurrentSpeed()==500.0)
+	{
+		ship->getSpriteSpaceShip()->setPosition(Vec2(245,150));
+	}
 	/*
     char speed[10]={'\0',};
     if (speed_label != NULL) {
@@ -287,52 +293,44 @@ void GameScene::feverMode()
 	{
 		src = GL_SRC_ALPHA;
 		dst = GL_ONE_MINUS_SRC_ALPHA;
-		CCLog("feverMode on");
+		CCLog("feverMode off");
+		//this->unschedule(schedule_selector(GameScene::testMakeObstacle));
+		//this->getEventDispatcher()->removeEventListener(contactListener);
+		Shared::getInstance()->setFeverMode(false);
 	}
 	else
 	{
 		src = GL_ONE_MINUS_DST_COLOR;
 		dst = GL_ZERO;
-		CCLog("feverMode off");
+		CCLog("feverMode on");
+
+		Shared::getInstance()->setFeverMode(true);
+
+		//test set feverMode spaceShip
+		Size visibleSize = Director::getInstance()->getVisibleSize();
+		//set of collision detection
+		contactListener = EventListenerPhysicsContact::create();
+		contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin,this);
+		//contactListener->onContactSeperate = CC_CALLBACK_1(GameScene::onContactFin,this);
+		this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener,this);
+		this->schedule(schedule_selector(GameScene::testMakeObstacle),1.0);
+
+
+		auto edgeBody = PhysicsBody::createEdgeBox(Size(visibleSize.width,visibleSize.height+2000),PHYSICSBODY_MATERIAL_DEFAULT,3);
+		edgeBody->setCollisionBitmask(3);
+		edgeBody->setContactTestBitmask(true);
+
+		auto edgeNode = Node::create();
+		edgeNode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
+		edgeNode->setPhysicsBody(edgeBody);
+
+		this->addChild(edgeNode);
+		CCLog("feverMode physics set on SpaceShip");
 	}
 
 	BlendFunc bf = {src, dst};
 	layer->setBlendFunc( bf );
-
-	//test set feverMode spaceShip
-	/*
-	if(!ship->getSpriteSpaceShip()->getPhysicsBody())
-	{//normal -> fever
-		Sprite* s = ship->getSpriteSpaceShip();
-		auto spriteBody = PhysicsBody::create();
-		spriteBody->setDynamic(false);
-		s->setPhysicsBody(spriteBody);
-	}
-	else
-	{//feverMode -> normal
-		Sprite* s = ship->getSpriteSpaceShip();
-		s->setPhysicsBody(NULL);
-	}
-	*/
-	CCLog("feverMode physics set on SpaceShip");
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	//set of collision detection
-	auto contactListener = EventListenerPhysicsContact::create();
-	contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin,this);
-	contactListener->onContactSeperate = CC_CALLBACK_1(GameScene::onContactFin,this);
-	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener,this);
-	this->schedule(schedule_selector(GameScene::testMakeObstacle),1.0);
-
-
-	auto edgeBody = PhysicsBody::createEdgeBox(Size(visibleSize.width,visibleSize.height+2000),PHYSICSBODY_MATERIAL_DEFAULT,3);
-	edgeBody->setCollisionBitmask(3);
-	edgeBody->setContactTestBitmask(true);
 	
-	auto edgeNode = Node::create();
-	edgeNode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
-	edgeNode->setPhysicsBody(edgeBody);
-
-	this->addChild(edgeNode);
 
 } 
 // for test
@@ -345,19 +343,35 @@ bool GameScene::onContactBegin(cocos2d::PhysicsContact & contact)
 	//if collided
 	if((1==a->getCollisionBitmask()&&2==b->getCollisionBitmask())||
 		(2==a->getCollisionBitmask()&&1==b->getCollisionBitmask()))
-	{
+	{//check spaceShip with blocks collision
 		CCLog("Collision!");
 		if(a->getCollisionBitmask()==2)
 		{
-			
+			a->applyForce(Vect(0,-150));
 		}
 		if(b->getCollisionBitmask()==2)
 		{
-			
+			b->applyForce(Vect(0,-150));
+		}
+		return true;
+	}
+	else if((2==a->getCollisionBitmask()&&3==b->getCollisionBitmask())||
+		(3==a->getCollisionBitmask()&&2==b->getCollisionBitmask()))
+	{//check wall with blocks collision
+		CCLog("Collision on wall");
+		if(a->getCollisionBitmask()==2)
+		{
+			a->getNode()->removeFromParent();
+			a->removeFromWorld();			
+		}
+		if(b->getCollisionBitmask()==2)
+		{
+			b->getNode()->removeFromParent();
+			b->removeFromWorld();			
 		}
 	}
 	
-	return true;
+	
 
 }
 void GameScene::onContactFin(cocos2d::PhysicsContact & contact)
@@ -371,11 +385,13 @@ void GameScene::onContactFin(cocos2d::PhysicsContact & contact)
 		CCLog("Collision on wall");
 		if(a->getCollisionBitmask()==2)
 		{
-			a->removeFromWorld();
+			a->getNode()->removeFromParent();
+			a->removeFromWorld();			
 		}
 		if(b->getCollisionBitmask()==2)
 		{
-			b->removeFromWorld();
+			b->getNode()->removeFromParent();
+			b->removeFromWorld();			
 		}
 	}
 }
@@ -383,6 +399,8 @@ void GameScene::onContactFin(cocos2d::PhysicsContact & contact)
 //test for make obstacle (physics body)
 void GameScene::testMakeObstacle(float dt)
 {
+	srand(time(NULL));
+	int a = rand();
 	Sprite* s = Sprite::create("feverObs.png");
 	s->setAnchorPoint(Vec2());
 	s->setPosition(Vec2(200,1300));
@@ -397,14 +415,11 @@ void GameScene::testMakeObstacle(float dt)
 		spriteBody->setCollisionBitmask(2);
 		spriteBody->setContactTestBitmask(true);
 		spriteBody->setVelocity(Vect(0,(float)1));
-		spriteBody->setAngularVelocityLimit(200);
+		spriteBody->setAngularVelocityLimit(100);
 
 		a->setPhysicsBody(spriteBody);
 		s->addChild(a);
-
 	}
-	
-
 }
 
 void GameScene::attachTestButtons() {
@@ -620,6 +635,7 @@ bool GameScene::buttonTouched(Touch *touch) {
 
 void GameScene::roadChangeScheduler(float dt)
 {
+	CCLog("spaceShip Pos : %f, %f",ship->getSpaceShipPos().x,ship->getSpaceShipPos().y);
     int a = rand()%10;
     switch (a)
     {

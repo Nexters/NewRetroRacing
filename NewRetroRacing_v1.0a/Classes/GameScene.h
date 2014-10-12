@@ -80,6 +80,7 @@ private:
 	//for physics world
 private:
 	cocos2d::PhysicsWorld* pWorld;
+	EventListenerPhysicsContact* contactListener;
 	void setPhysicsWorld(cocos2d::PhysicsWorld* world){  pWorld = world;  };
 
 	void testMakeObstacle(float dt);
