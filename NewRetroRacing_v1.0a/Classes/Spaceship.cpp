@@ -29,14 +29,12 @@ Spaceship::Spaceship(int ship_num) {
     ship->setAnchorPoint(Point(0.5, 0.5));
     ship->setPosition(Point(getXPositionOfShip(cur_lane_num), INITIAL_Y));
 	
-	auto spriteBody = PhysicsBody::createBox(Size(200,200),PhysicsMaterial(0,1,0));
+	auto spriteBody = PhysicsBody::createCircle(100.0,PhysicsMaterial(0,1,0));
 	spriteBody->setCollisionBitmask(1);
 	spriteBody->setContactTestBitmask(true);
 	spriteBody->setDynamic(false);
 	ship->setPhysicsBody(spriteBody);
 	
-	CCLog("ship Pos : %f ,%f",ship->getPosition().x,ship->getPosition().y);
-	CCLog("ship Anc : %f, %f",ship->getAnchorPoint().x,ship->getAnchorPoint().y);
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
 	addFire();
