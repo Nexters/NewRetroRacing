@@ -58,12 +58,11 @@ float Shared::getCurrentElapsedTime() {
     return elapsed_time;
 }
 void Shared::incrementElapsedTime(int sec) {
-    
     elapsed_time += sec;
     current_speed = BASIC_SPEED + (SPEED_CONSTANT * elapsed_time);
-//    float variation = powf(((float)elapsed_time * (SPEED_CONSTANT * 0.01)), 3);
-//    if (current_speed + variation < SPEED_LIMIT)
-//        current_speed = BASIC_SPEED + variation;
+    float variation = powf(((float)elapsed_time * (SPEED_CONSTANT * 0.01)), 3);
+    if (current_speed + variation < SPEED_LIMIT)
+        current_speed = BASIC_SPEED + variation;
 }
 
 float Shared::getCurrentSpeed() {
@@ -76,6 +75,8 @@ void Shared::resetGameSceneData() {
     elapsed_time = 0.0;
     current_speed = BASIC_SPEED;
     coin_count = 0;
+	feverModeBit=false;
+	obstacle_count=0;
 }
 void Shared::resetElapsedTime() {
     
@@ -97,9 +98,29 @@ bool Shared::isFeverMode()
 }
 void Shared::setFeverMode(bool bit)
 {
-	feverModeBit = bit;
+	if(bit)
+	{//false -> true || true -> true
+		feverModeBit = true;
+		saved_speed = current_speed;
+		current_speed = SPEED_LIMIT;
+	}
+	else
+	{//false -> false || true -> false
+		feverModeBit = false;
+		current_speed = saved_speed;
+		saved_speed=0.0;
+	}
 }
 
+void Shared::addObsCount()
+{
+	obstacle_count++;
+}
+
+int Shared::getObsCount()
+{
+	return obstacle_count;
+}
 
 Shared::Shared() {
     
@@ -107,6 +128,8 @@ Shared::Shared() {
     screen_size_ratio = 1.0;
     current_speed = BASIC_SPEED;
 	coin_count = 0;
+	feverModeBit=false;
+	obstacle_count=0;
 }
 Shared::~Shared() {
     

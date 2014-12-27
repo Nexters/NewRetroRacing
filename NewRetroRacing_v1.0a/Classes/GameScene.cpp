@@ -45,6 +45,7 @@ bool GameScene::init()
     {
         return false;
     }
+	srand((unsigned int)time(NULL));
     
 	initGameSceneData();
 
@@ -70,7 +71,7 @@ bool GameScene::init()
     robj_cont->attachRObjectsTo(this, 4);
     road_cont->addRoadChangeObserver(robj_cont);
     
-    //robj_cont->startGeneratingRObjects();
+    robj_cont->startGeneratingRObjects();
     
     detector = ConflictDetector::create(this, road_cont, ship, robj_cont);
     
@@ -113,7 +114,6 @@ bool GameScene::init()
 	this->addChild(blendLayer,100,123);
 	this->setKeypadEnabled(true);
 
-	CCLog("spaceShip Pos : %f, %f",ship->getSpaceShipPos().x,ship->getSpaceShipPos().y);
     return true;
 }
 
@@ -122,7 +122,8 @@ void GameScene::initGameSceneData() {
     speed_label = NULL;
     coin_label = NULL;
     
-    Size visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
+	origin = Director::getInstance()->getVisibleOrigin();
     Shared* shared = Shared::getInstance();
     shared->resetGameSceneData();
     shared->setScreenSizeRatio(visibleSize.width / GAME_SCENE_WIDTH);
@@ -176,12 +177,10 @@ void GameScene::onTouchMoved(Touch* touch, Event* event) {
     currTouchPos[0] = touch->getLocation().x;
 	currTouchPos[1] = touch->getLocation().y;
 }
-
 void GameScene::onTouchEnded(Touch* touch, Event* event) {
     
 	isTouchDown=false;
 }
-
 void GameScene::onTouchCancelled(Touch* touch, Event* event) {
     
 	onTouchEnded(touch,event);
@@ -201,8 +200,8 @@ void GameScene::update(float dt) {
         speed_str->append(speed);
         speed_label->setString(speed_str->c_str());
         free(speed_str);
-    }*/
-    
+    }
+    */
     char coin[10] = {'\0', };
     if (coin_label != NULL) {
         std::string *coin_str = new std::string("Coin: ");
@@ -213,10 +212,28 @@ void GameScene::update(float dt) {
     }
     
     detector->handleConflict();
-	ptBar->setPercentage(5.0*Shared::getInstance()->getCoinData());
-    
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	if(Shared::getInstance()->isFeverMode())
+	{//fever mode ing
+		if(ptBar->getPercentage()>0.00f)
+			ptBar->setPercentage(100.0f-10.0f/36.0f);
+		else//다 줄어서 0보다 작거나 0일때
+		{
+			Shared::getInstance()->setFeverMode(false);
+			feverMode();
+		}
+	}
+	else
+	{// not fever mode
+		if(ptBar->getPercentage()<100.0f)
+		{
+			ptBar->setPercentage(3.33*Shared::getInstance()->getCoinData());
+		}
+		else
+		{
+			Shared::getInstance()->setFeverMode(true);
+			feverMode();
+		}
+	}
 
 	if(true==isTouchDown)
 	{
@@ -255,8 +272,6 @@ void GameScene::update(float dt) {
 }
 
 //void GameScene::gameOver(float delta) {
-
-	//
 //}
 
 
@@ -275,7 +290,6 @@ void GameScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 			blendLayer->setOpacity(0);
 			feverMode();
 		}
-
 	}
 	else if(keyCode==EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
@@ -290,21 +304,16 @@ void GameScene::feverMode()
 	GLenum dst;
 
 	if( layer->getBlendFunc().dst == GL_ZERO )
-	{
+	{// GL_ZERO 일때 == 순수한 layer -> 현재 상태는 no fever mode
 		src = GL_SRC_ALPHA;
 		dst = GL_ONE_MINUS_SRC_ALPHA;
 		CCLog("feverMode off");
-		//this->unschedule(schedule_selector(GameScene::testMakeObstacle));
-		//this->getEventDispatcher()->removeEventListener(contactListener);
-		Shared::getInstance()->setFeverMode(false);
 	}
 	else
 	{
 		src = GL_ONE_MINUS_DST_COLOR;
 		dst = GL_ZERO;
 		CCLog("feverMode on");
-
-		Shared::getInstance()->setFeverMode(true);
 
 		//test set feverMode spaceShip
 		Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -399,7 +408,6 @@ void GameScene::onContactFin(cocos2d::PhysicsContact & contact)
 //test for make obstacle (physics body)
 void GameScene::testMakeObstacle(float dt)
 {
-	srand(time(NULL));
 	int a = rand();
 	Sprite* s = Sprite::create("feverObs.png");
 	s->setAnchorPoint(Vec2());

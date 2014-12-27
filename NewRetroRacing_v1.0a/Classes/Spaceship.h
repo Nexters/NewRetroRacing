@@ -25,9 +25,11 @@ public:
 
 	Vec2 getSpaceShipPos();
 	Vec2 getMoveRange();
+	PhysicsBody* getSpacePhysicsBody();
 	Sprite* getSpriteSpaceShip();
 	void moveRight();
 	void moveLeft();
+	void resetting();
 
 private:
     void relocateShip(int lane_change, int where);
@@ -38,6 +40,7 @@ private:
     
 private:
     Sprite *ship;
+	PhysicsBody* body;
 
     float ratio;
     float distance;

@@ -12,6 +12,12 @@ Spaceship::Spaceship(int ship_num) {
         case 0:
             ship_name->append("rocket.png");
             break;
+		case 1:
+            ship_name->append("rocket2.png");
+            break;
+		case 2:
+            ship_name->append("rocket3.png");
+            break;
         default:
             ship_name->append("rocket.png");
             break;
@@ -23,17 +29,16 @@ Spaceship::Spaceship(int ship_num) {
     cur_lane_num = 0;
     ratio = 1.0;
     distance = (ROAD_WIDTH - (RAIL_WIDTH * ratio * 2)) / num_lane;
-    //CCLOG("dis %f %d", distance, num_lane );
     
     ship = Sprite::create(ship_name->c_str());
     ship->setAnchorPoint(Point(0.5, 0.5));
     ship->setPosition(Point(getXPositionOfShip(cur_lane_num), INITIAL_Y));
 	
-	auto spriteBody = PhysicsBody::createCircle(100.0,PhysicsMaterial(0,1,0));
-	spriteBody->setCollisionBitmask(1);
-	spriteBody->setContactTestBitmask(true);
-	spriteBody->setDynamic(false);
-	ship->setPhysicsBody(spriteBody);
+	body = PhysicsBody::createCircle(100.0,PhysicsMaterial(0,1,0));
+	body->setCollisionBitmask(1);
+	body->setContactTestBitmask(true);
+	body->setDynamic(false);
+	ship->setPhysicsBody(body);
 	
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
@@ -156,6 +161,11 @@ Sprite* Spaceship::getSpriteSpaceShip()
 	return ship;
 }
 
+PhysicsBody* Spaceship::getSpacePhysicsBody()
+{
+	return body;
+}
+
 void Spaceship::moveRight()
 {
 	cur_lane_num++;
@@ -168,6 +178,17 @@ void Spaceship::moveLeft()
 	cur_lane_num--;
 	auto act = MoveBy::create(0.01*SPEEDVAL,Vec2(-distance,0));
 	ship->runAction(act);
+}
+
+//피버모드에 들어설때 부르는 함수
+void Spaceship::resetting()
+{//resetting spaceship, sprite, physicsBody
+	if(Shared::getInstance()->isFeverMode())
+	{//
+
+	}
+	else
+	{}
 }
 
 void Spaceship::releaseSpaceship() {

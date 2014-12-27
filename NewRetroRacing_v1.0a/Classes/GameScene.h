@@ -67,6 +67,9 @@ private:
     Label* speed_label;
     Label* coin_label;
 
+	Size visibleSize;
+	Vec2 origin;
+
     //int roadLineNumber;
     bool isTouchDown;
     float initTouchPos[2];

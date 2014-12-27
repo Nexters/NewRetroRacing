@@ -46,6 +46,8 @@ public:
 	void setCoinData(int coin);
 	int getCoinData();
 
+	void addObsCount();
+	int getObsCount();
     
 private:
     Shared();
@@ -60,13 +62,16 @@ private:
     float current_speed;
     int cur_lane_cnt;
 	int coin_count;
+	int obstacle_count;
 
 private:
 	bool feverModeBit;
+	float saved_speed;
 
 public:
 	bool isFeverMode();
 	void setFeverMode(bool bit);
+	
 };
 
 float getXPositionOfObject(int lane_cnt, int lane_num, float ratio);
