@@ -42,7 +42,7 @@ Spaceship::Spaceship(int ship_num) {
 	
 	roadRange.x = 100+distance;
 	roadRange.y = 620-distance;
-	addFire();
+	//addFire();//fire deleted
 }
 
 void Spaceship::addFire()
